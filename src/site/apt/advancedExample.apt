@@ -1,0 +1,684 @@
+An advanced example
+
+* Our goals
+
+  This example is an extension of the basic example with an object model about persons.
+  
+  We will let people marry and divorce. We will see that the object model is not so
+  simple in this case, but complexity is completely encapsulated in the object model.
+  And this is a good thing because the object model is easier to test than a complete
+  application with database and user interface integration. 
+  
+* The object model
+
+  A marriage is an association between two person. This association is:
+  
+  * A self association, because it links two persons
+  
+  * A many-to-many association, because we want to give people the possibility to
+    divorce and marry again
+    
+  * A bidirectional association, because we want to know about the marriage from
+    both partners
+    
+  []
+    
+  The association has attributes too, because we want to track the dates of the
+  marriage and of the divorce.
+  
+  To implement such an association we need a class that represents the association.
+  This class will have the attributes that correspond to both the side of the application
+  and the start (marriage) and end (divorce) dates.
+  
+  Do we need an entity or a value object? The answer is simple. The object will start
+  with only the start date and the end date will be set only in case of divorce. As the
+  association object changes its state during its lifetime it cannot be a value, it needs
+  to be an entity!
+  
+  So this is the code of our Marriage class:
+  
++------------------------------------------------------------+
+public class Marriage extends EntityImpl {
+    private Person husband;
+    private Person wife;
+    private Date from;
+    private Date to;
+
+    protected Marriage() {
+	
+    }
+
+    protected Marriage(Person p1, Person p2, Date date) {
+        this.husband = p1.getGender() == MALE ? p1 : p2;
+        this.wife = p1.getGender() == FEMALE ? p1 : p2;
+        this.from = date;
+    }
+
+    public Person getHusband() {
+        return husband;
+    }
+
+    public Person getWife() {
+        return wife;
+    }
+
+    public Date getFrom() {
+        return from;
+    }
+
+    public Date getTo() {
+        return to;
+    }
+
+    public void setTo(Date to) {
+        this.to = to;
+    }
+
+    public boolean isTerminated() {
+        return to != null;
+    }
+
+}
++------------------------------------------------------------+
+
+  The most complex thing here is the constructor that decides who is the husband and
+  who is the wife depending on the sex of the two persons.
+
+  It is simple to create a table to persist such an entity:
+  
++-----------------------------------------------------------+
+create table marriage (
+    id integer(10) auto_increment primary key,
+    version integer(10),
+    husband_id integer(10),
+    wife_id integer(10),
+    fromDate date,
+    toDate date
+)
++-----------------------------------------------------------+
+ 
+  And the mapping file is similarly simple:
+  
++------------------------------------------------------------+
+<hibernate-mapping default-access="field" package="it.amattioli.example1">
+
+    <class name="Marriage" table="marriage">
+
+        <id name="id" type="java.lang.Long">
+            <generator class="native" />
+        </id>
+
+        <version name="version" type="java.lang.Long" />
+
+        <many-to-one name="husband" column="husband_id" lazy="false"/>
+
+        <many-to-one name="wife" column="wife_id" lazy="false"/>
+
+        <property name="from" column="fromDate"/>
+
+        <property name="to" column="toDate"/>
+
+    </class>
+
+</hibernate-mapping>
++------------------------------------------------------------+
+
+  The person class, instead, is a bit tricky. Given a generic person we don't know
+  if he (or she) will be married as a husband or as a wife, it depends on the sex.
+  
+  So, in the Person class, we need to put two collections: the list of marriages as a
+  husband and the list of the marriages as a wife. Then the getMarriages() method will
+  decide which collection will be returned based on the person sex.
+  
++------------------------------------------------------------+
+    private List<Marriage> marriagesAsHusband = new ArrayList<Marriage>();
+    private List<Marriage> marriagesAsWife = new ArrayList<Marriage>();
+  
+    private List<Marriage> getMarriages() {
+        return gender == MALE ? marriagesAsHusband : marriagesAsWife;
+    }
++------------------------------------------------------------+
+
+  And this is what we have to add to the Person hibernate mapping file
+  
++------------------------------------------------------------+
+    <bag name="marriagesAsHusband" lazy="true" inverse="true" cascade="all" order-by="fromDate desc">
+        <key column="husband_id"/>
+        <one-to-many class="Marriage"/>
+    </bag>
+		
+    <bag name="marriagesAsWife" lazy="true" inverse="true" cascade="all" order-by="fromDate desc">
+        <key column="wife_id"/>
+        <one-to-many class="Marriage"/>
+    </bag>
++------------------------------------------------------------+
+  
+  We can also add isMarried(), marry() and divorce() methods. Their goal should
+  be evident.
+  
++------------------------------------------------------------+
+    public boolean isMarried() {
+        List<Marriage> marriages = getMarriages();
+        boolean result = !marriages.isEmpty() 
+                      && !marriages.get(0).isTerminated();
+        return result;
+    }
+
+    public void marry(Person other, Date date) {
+        if (this.isMarried()) throw new IllegalStateException();
+        if (other.isMarried()) throw new IllegalArgumentException();
+        Marriage newMarriage = new Marriage(this, other, date);
+        this.getMarriages().add(0, newMarriage);
+        other.getMarriages().add(0, newMarriage);
+	}
+
+    public void divorce(Date date) {
+        if (!this.isMarried()) throw new IllegalStateException();
+        getMarriages().get(0).setTo(date);
+    }
++------------------------------------------------------------+
+  
+  We ordered the collections so that the last marriage has always index 0. So we
+  can check if the person is married looking at the element with index 0.
+  
+* Developing the custom command
+
+  Now the object model is ready to be used. What we need is a command to let two 
+  person marry each other. 
+  
+  We will start from a single person, then we will choose his (or her) partner,
+  the wedding date, and we will call the marry method.
+  
+  We are not editing an object like we did in the basic example, so we cannot use
+  an editor, we need to develop a custom command. This command must implement the
+  Command interface but for most cases the simplest thing to do is to extend the
+  AbstractCommand class.
+  
+  The custom command will have an overridden doCommand() method that will perform
+  the command. In this case it will call the marry() method of a person.
+  
+  The command will have a subject property too. It will hold the starting person,
+  the one on which the marry() method will be called.
+  
+  Then we need something we can use to choose the partner that the person will marry.
+  A ListBrowser is exactly what we need.
+  
+  And, finally, we need an attribute for the wedding date.
+  
+  The result is the following:
+  
++---------------------------------------------------------------+
+public class MarriageCommand extends AbstractCommand {
+    private Person subject;
+    private Date date;
+    private ListBrowser<Long, Person> otherPersonBrowser;
+
+    public void setSubjectId(Long id) {
+        subject = Person.repository().get(id);
+    }
+
+    public Person getSubject() {
+        return subject;
+    }
+
+    @NotNull
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    @SameContext
+    public void setOtherPersonBrowser(ListBrowserImpl<Long, Person> browser) {
+        this.otherPersonBrowser = browser;
+        this.otherPersonBrowser.setSpecification(new PersonSpecification());
+    }
+
+    public ListBrowser<Long, Person> getOtherPersonBrowser() {
+        return otherPersonBrowser;
+    }
+
+	@Override
+	public void doCommand() throws ApplicationException {
+		getSubject().marry(getOtherPersonBrowser().getSelectedObject(), getDate());
+		super.doCommand();
+	}
+}
++---------------------------------------------------------------+ 
+
+  Notice that:
+  
+  * We annotated the getDate() method of the command with @NotNull to trigger validation.
+    When we are editing an object the annotations should be placed on the domain object,
+    when we develop a custom command we have to validate (probably) the parameters of
+    a method that cannot be annotated (yet), so we have to annotate the command properties.
+
+  * We annotated the setOtherPersonBrowser() method with @SameContext to be sure that the
+    command and the browser share the same Hibernate session.
+    
+  []
+    
+  To be sure that when the command is executed a partner was selected we can add a
+  validate() method:
+  
++-----------------------------------------------------------------+
+    public ValidationResult validate() {
+        if (getOtherPersonBrowser().getSelectedObject() == null) {
+            return new ValidationResult(ValidationResult.ResultType.INVALID, 
+                                        "Select a partner");
+        }
+        return null;
+    }
++-----------------------------------------------------------------+
+
+  The GuidATE user interface will automatically call this method before calling
+  doCommand() and will stop and show the message in case of a validation result
+  with type INVALID.
+
+  The command should work but has a problem. The list of the available persons
+  to marry that the browser will produce contains all the persons we created, but
+  we want to show only:
+  
+  * Non married people
+  
+  * Persons of the opposite sex than the starting person
+  
+  []
+  
+  And we should not show the starting person himself.
+  
+  We can do this using a specification class but we canot use one of the predefined specifications
+  we already used in PersonSpecification, we need a custom specification: a MarriableSpecification
+  
++------------------------------------------------------------------+
+public class MarriableSpecification extends AbstractSpecification<Person> {
+    private Person value = null;
+
+    public Person getValue() {
+        return value;
+    }
+
+    public void setValue(Person marriableTo) {
+        this.value = marriableTo;
+    }
+
+    @Override
+    public boolean isSatisfiedBy(Person element) {
+        if (element == null) return false;
+        boolean result = value == null
+                         || !value.getGender().equals(element.getGender())
+                         && !element.isMarried() ;
+        return result;
+    }
+
+    @Override
+    public boolean supportsAssembler(Assembler assembler) {
+        return assembler instanceof CriteriaAssembler;
+    }
+    
+    @Override
+    public void assembleQuery(Assembler assembler) {
+        ((CriteriaAssembler)assembler).addAdditionalPredicate(new SpecificationPredicate<Person>(this));
+	}
+
+}
++------------------------------------------------------------------+
+
+  This specification takes a Person object as its value and will be satisfied by all
+  persons that can marry him (or her). The isSatisfied() method do exactly this job.
+  
+  But we need to use this specification when we retrieve a list from a ListBrowser.
+  This is achieved overriding supportsAssembler() and assembleQuery().
+  
+  The first method is used to know which type of query we are going to do. For hibernate
+  persisted objects we can choose between HQL and criteria query, here we are supporting
+  criteria query only.
+  
+  The assembleQuery() method do the real job of assembling the criteria query. But in this
+  case the condition is a bit complex so we decided to use a trick: we add a predicate
+  that will be checked on all the objects returned by the query. 
+  
+  Obviously this is not always the best thing to do. You should not do it if you think
+  the query will retrieve a lot of objects!
+  
+  The added predicate will simply apply the isSatisfiedBy() method on all the objects
+  retrieved by the query.
+  
+  We now have to use this specification in PersonSpecification so we add:
+  
++--------------------------------------------------------------------+
+    private MarriableSpecification marriableTo = new MarriableSpecification();
+
+    public PersonSpecification() {
+        addSpecification(firstName);
+        addSpecification(lastName);
+        addSpecification(birthdate);
+        addSpecification(genders);
+        addSpecification(marriableTo);
+    }
+
+    public Person getMarriableTo() {
+        return marriableTo.getValue();
+    }
+
+    public void setMarriableTo(Person value) {
+        marriableTo.setValue(value);
+    }
++--------------------------------------------------------------------+
+  
+  We are ready to use the specification in the MarriageCommand:
+  
++--------------------------------------------------------------------+
+    public void setSubjectId(Long id) {
+        subject = Person.repository().get(id);
+        ((PersonSpecification)getOtherPersonBrowser().getSpecification()).setMarriableTo(subject);
+    }
++--------------------------------------------------------------------+
+
+  When we set the starting person in the MarriageCommand we will set the marriableTo
+  property of the otherPersonBrowser specification. In this way the browser will
+  retrieve only the persons that can marry the starting person.
+  
+  Finally we have to add a factory method for the new command in the service factory:
+  
++--------------------------------------------------------------------+
+    public MarriageCommand createMarriageCommand() {
+        MarriageCommand cmd = new MarriageCommand();
+        cmd = TransactionalCommandContext.newTransaction(cmd);
+        cmd.setOtherPersonBrowser(new ListBrowserImpl<Long, Person>(Person.repository()));
+        return cmd;
+    }
++--------------------------------------------------------------------+
+  
+* The marriage user interface
+
+  The user interface of the marriage command is not difficult to implement:
+  
++--------------------------------------------------------------------+
+<zk>
+	
+    <window id="marriageWindow"
+            title="Marriage" 
+            border="normal" 
+            width="350px"
+            apply="it.amattioli.guidate.containers.CommandComposer, 
+                   it.amattioli.guidate.containers.ValidatingComposer,
+	               it.amattioli.guidate.validators.BeanValidatorComposer">
+  	             
+        <custom-attributes backBean="marriageCommand" 
+                           backBean.subjectId="${arg.personId}"/>
+	
+        <separator height="10px"/>
+
+        <label value="Select the partner"/>
+		    	
+        <vbox width="100%"
+              apply="it.amattioli.guidate.containers.BackBeanComposer">
+
+            <custom-attributes backBean="${marriageWindow.backBean.otherPersonBrowser}"/>
+
+            <browserListbox id="personList" rows="5" width="99%">
+                <listhead>
+                    <browserListheader label="First Name" width="25%"/>
+                    <browserListheader label="Last Name"  width="25%"/>
+                    <browserListheader label="Birth Date" width="25%"/>
+                    <browserListheader label="Birth Town" width="25%"/>
+                </listhead>
+                <listitemPrototype>
+                    <labelListcell propertyName="firstName"/>
+                    <labelListcell propertyName="lastName"/>
+                    <labelListcell propertyName="birthDate" conversionFormat="dd/MM/yyyy"/>
+                    <labelListcell propertyName="gender"/>
+                </listitemPrototype>
+            </browserListbox>
+        </vbox>
+
+        <separator height="10px"/>
+
+        <hbox widths="50%,50%">
+            <label value="Date:"/>
+            <dateProperty propertyName="date"/>
+        </hbox>
+
+        <separator height="10px"/>
+
+        <hbox>
+            <button label="Ok"     width="70px" forward="onDoCommand"/>
+            <button label="Cancel" width="70px" forward="onCancelCommand"/>
+        </hbox>
+    </window>
+
+</zk>
++--------------------------------------------------------------------+
+
+  The date property and the Ok/Cancel button are similar to the one in the person editor
+  zul page while the BeanValidationComposer is used to trigger the entire command
+  validation calling the validate() method.
+  
+  The real new thing here is the browser.
+  
+  We have a vbox to which we applied the BackBeanComposer so it can act as a back-bean
+  container. The backbean is not set as a string used to create it from the service
+  factory, instead it is set directly getting it from the command.
+  
+  While its surrounding is different, the browser listbox is identical to the one we 
+  used in personBrowser.zul. If we want we can put it a different zul file, call it
+  personList.zul and refactor both personBrowser.zul and marriage.zul to include this
+  new file. The marriage.zul file is representative:
+  
++--------------------------------------------------------------------+
+<?component name="personList" macroURI="personList.zul"?>
+<zk>
+	
+    <window id="marriageWindow"
+            title="Marriage" 
+            border="normal" 
+            width="350px"
+            apply="it.amattioli.guidate.containers.CommandComposer, 
+                   it.amattioli.guidate.containers.ValidatingComposer,
+	               it.amattioli.guidate.validators.BeanValidatorComposer">
+  	             
+        <custom-attributes backBean="marriageCommand" 
+                           backBean.subjectId="${arg.personId}"/>
+	
+        <separator height="10px"/>
+
+        <label value="Select the partner"/>
+		    	
+        <vbox width="100%"
+              apply="it.amattioli.guidate.containers.BackBeanComposer">
+
+            <custom-attributes backBean="${marriageWindow.backBean.otherPersonBrowser}"/>
+
+            <personList/>
+        </vbox>
+
+        <separator height="10px"/>
+
+        <hbox widths="50%,50%">
+            <label value="Date:"/>
+            <dateProperty propertyName="date"/>
+        </hbox>
+
+        <separator height="10px"/>
+
+        <hbox>
+            <button label="Ok"     width="70px" forward="onDoCommand"/>
+            <button label="Cancel" width="70px" forward="onCancelCommand"/>
+        </hbox>
+    </window>
+
+</zk>
++--------------------------------------------------------------------+
+
+  But having the command window is not sufficient, we need a way to recall it.
+  
+  We can use a button in the person browser toolbar like we did for the creation of
+  a new person, but now the button should be visible only if the selected person
+  is not married yet.
+  
+  We can obtain this effect in a simple way if the button composer extends
+  BrowsingToolComposer and override the isVisible() method.
+  
++--------------------------------------------------------------------+
+public class MarriageBtnComposer extends BrowsingToolComposer {
+
+    public void onClick() throws Exception {
+        HashMap<String, Object> arg = new HashMap<String, Object>();
+        arg.put("personId", getBrowser().getSelectedObject().getId());
+        Window win = (Window)Executions.createComponents("marriage.zul", null, arg);
+        win.doModal();
+    }
+
+    @Override
+    public boolean isVisible() {
+        return !((Person)getBrowser().getSelectedObject()).isMarried();
+    }
+
+}
++--------------------------------------------------------------------+
+
+  The composer will listen to the browser selection events and will show or hide the
+  button depending on the result of the isVisible() method. In this composer you can
+  use the getBrowser() method to access the underlying browser.
+  
+  This is the new toolbar:
+  
++--------------------------------------------------------------------+
+<toolbar>
+    <toolbarbutton label="New Person" 
+                   apply="it.amattioli.example1.NewPersonBtnComposer"/>
+    <space/>
+    <toolbarbutton label="Marry" 
+                   apply="it.amattioli.example1.MarriageBtnComposer"
+                   visible="false"/>
+</toolbar>
++--------------------------------------------------------------------+
+
+  The Marry button is initially not visible because there is no person selected
+  in the browser. If we select a non-married person the button will be shown.
+
+* Divorcing
+
+  As the Person divorce method takes only one date parameter, implementing divorcing 
+  is even more simple.
+  
+  First, we have to develop the DivorceCommand class:
+  
++---------------------------------------------------------------------+
+package it.amattioli.example1;
+
+import java.util.Date;
+
+import it.amattioli.applicate.commands.AbstractCommand;
+import it.amattioli.applicate.commands.ApplicationException;
+
+public class DivorceCommand extends AbstractCommand {
+    private Person subject;
+    private Date date;
+
+    public void setSubjectId(Long id) {
+        subject = Person.repository().get(id);
+    }
+
+    public Person getSubject() {
+        return subject;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    @Override
+    public void doCommand() throws ApplicationException {
+        getSubject().divorce(getDate());
+        super.doCommand();
+    }
+}
++---------------------------------------------------------------------+ 
+
+  Obviously there should be a factory method in the service factory:
+  
++---------------------------------------------------------------------+
+    public DivorceCommand createDivorceCommand() {
+        DivorceCommand cmd = new DivorceCommand();
+        cmd = TransactionalCommandContext.newTransaction(cmd);
+        return cmd;
+    }
++---------------------------------------------------------------------+  
+
+  Then the zul page:
+  
++---------------------------------------------------------------------+
+<zk>
+
+    <window id="divorceWindow"
+            title="Divorce" 
+            border="normal" 
+            width="350px"
+            apply="it.amattioli.guidate.containers.CommandComposer, 
+                   it.amattioli.guidate.containers.ValidatingComposer">
+	  	             
+        <custom-attributes backBean="divorceCommand" 
+                           backBean.subjectId="${arg.personId}"/>
+
+        <separator height="10px"/>
+
+        <hbox widths="50%,50%">
+            <label value="Date:"/>
+            <dateProperty propertyName="date"/>
+        </hbox>
+
+        <separator height="10px"/>
+
+        <hbox>
+            <button label="Ok"     width="70px" forward="onDoCommand"/>
+            <button label="Cancel" width="70px" forward="onCancelCommand"/>
+        </hbox>
+    </window>
+
+</zk>
++---------------------------------------------------------------------+
+  
+  And finally we can add a button to the toolbar to trigger divorce:
+  
++---------------------------------------------------------------------+
+<toolbar>
+    <toolbarbutton label="New Person" 
+                   apply="it.amattioli.example1.NewPersonBtnComposer"/>
+    <space/>
+    <toolbarbutton label="Marry" 
+                   apply="it.amattioli.example1.MarriageBtnComposer"
+                   visible="false"/>
+    <toolbarbutton label="Divorce" 
+                   apply="it.amattioli.example1.DivorceBtnComposer"
+                   visible="false"/>
+</toolbar>
++---------------------------------------------------------------------+
+
+  where the button composer is:
+  
++---------------------------------------------------------------------+
+public class DivorceBtnComposer extends BrowsingToolComposer {
+
+    public void onClick() throws Exception {
+        HashMap<String, Object> arg = new HashMap<String, Object>();
+        arg.put("personId", getBrowser().getSelectedObject().getId());
+        Window win = (Window)Executions.createComponents("divorce.zul", null, arg);
+        win.doModal();
+    }
+
+    public boolean isVisible() {
+        return ((Person)getBrowser().getSelectedObject()).isMarried();
+    }
+
+}
++---------------------------------------------------------------------+
+
+* Showing a person marriages

@@ -1,0 +1,4 @@
+it.amattioli.encapsulate.money.specifications.DefaultMoneySpecification
+it.amattioli.encapsulate.money.specifications.CriteriaMoneySpecification
+it.amattioli.encapsulate.money.specifications.HqlMoneySpecification
+it.amattioli.encapsulate.money.specifications.JpaqlMoneySpecification

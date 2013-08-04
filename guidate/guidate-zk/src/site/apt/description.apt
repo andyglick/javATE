@@ -1,0 +1,604 @@
+User Guide
+
+* Introduction
+
+ GuidATE is a system of adapters for the ZK web framework that simplify the use of this
+ framework with ApplicATE and DominATE.
+ 
+ GuidATE follows the classic MVC principle. Imagine your ApplicATE services as your
+ model and create views using ZK zul pages, then bind them together so that anywhere
+ something changes the other side of the bind changes too.
+ 
+ Suppose, for example, that you have an ApplicATE command with two properties, say
+ propertyA and propertyB and imagine that propertyB value changes when propertyA is
+ set.
+ 
+ Suppose now that you have a zul page bound to this service with two text boxes
+ bound to propertyA and propertyB respectively. If the user types something in the
+ former text box, propertyA is set, propertyB changes and fires a PropertyChangeEvent.
+ The latter text box listen to propertyB event and update its content. 
+
+* Back beans
+
+ The main concept behind GuidATE binding implementation is that of "back bean".
+ 
+ A "back bean" is an object, typically an ApplicATE service, bound to a container
+ ZK component like a window, a vbox (or hbox), etc. The binding is performed applying
+ the BackBeanComposer to the component and specifying the back bean with the "backBean"
+ custom attribute, like in the following example:
+ 
++---------------------------------------------+
+<window apply="it.amattioli.guidate.containers.BackBeanComposer">
+	<custom-attributes backBean="${myService}"/>
+	
+	...
+	
+</window>
++---------------------------------------------+   
+
+ The "backBean" custom attribute can be specified in two ways:
+ 
+ * You can directly specify the object to be bound, like in the example
+ 
+ * You can specify a String. In this case the real back bean will be created calling
+   the createService method on the ApplicateSession passing in the specified string.
+   The ApplicateSession subclass and service factory used can be specified in the
+   GuidATE configuration as described in the {{Configuration}} section.
+ 
+ []
+ 
+ If you have a component inside this window, i.e. a button, you can find its back
+ bean using the BackBeans utility class:
+ 
++---------------------------------------------+
+Object backBean = BackBeans.findBackBean(comp);
++---------------------------------------------+
+
+ where comp is a reference to the button. The findBackBean method will look upside
+ the parent-child components structure until it find a container component bound to
+ a back bean.
+
+ If you are interested in this container instead of the back bean, use the findContainer
+ method:
+ 
++-----------------------------------------------------+
+ Component container = BackBeans.findContainer(comp);
++-----------------------------------------------------+
+ 
+ If you are inside an event handler you can look for the event target back bean:
+ 
++---------------------------------------------+
+public void onClick(Event evt) {
+    Object backBean = BackBeans.findTargetBackBean(evt);
+
+    ...
+
+}
++---------------------------------------------+ 
+
+* Properties
+
+ Inside a back bean bound container you can put property bound components.
+
+** Non-editable properties
+ 
+ The simplest property component is "propertyValue". This is a label that
+ shows the value of a property of the back bean. The label is bound to the
+ property so as to update its content if the back bean fires a PropertyChangeEvent
+ for the bound property.
+ 
+ Like all the other property bound components, a "propertyValue" component can 
+ be specified in two ways:
+ 
+ * applying a composer to a standard ZK component
+ 
+ * using a custom component
+ 
+ []
+ 
+ so the following two are equivalent:
+ 
++----------------------------------------------+
+<label apply="it.amattioli.guidate.properties.LabelPropertyComposer">
+	<custom-attributes propertyName="myProperty"/>
+</label>
++----------------------------------------------+
+
++----------------------------------------------+
+<propertyValue propertyName="myProperty"/>
++----------------------------------------------+  
+
+ The "propertyName" attribute is the name of the property of the back bean object
+ you are binding to. You can specify:
+ 
+ * simple properties, i.e. propertyName="myProperty"
+ 
+ * nested properties, i.e. propertyName="myProperty.hisProperty"
+ 
+ * indexed properties, i.e. propertyName="myProperty[5]"
+ 
+ * mapped properties, i.e. propertyName="myProperty(aStringValue)"
+ 
+ Refer to {{{http://commons.apache.org/beanutils/}Apache Commons BeanUtils}} 
+ documentation for details. 
+
+ Property bound composers do type conversion too. They guess the right converter
+ using the property class but you can specify your own type converter using the
+ "typeConverter" attribute:
+ 
++--------------------------------------------------------------+
+<propertyValue propertyName="myProperty" type="it.amattioli.myProject.myTypeConverter"/>
++--------------------------------------------------------------+ 
+
+ Refer to the {{Type conversion}} section for details.
+ 
+ For properties whose class is a collection you can use the "propertyGrid" component.
+ It shows a grid with a row for each element of the collection. Obviously every time
+ the back bean fires a PropertyChangeEvent for the collection the grid is update.
+ 
+ The two forms of this component are:
+ 
++---------------------------------------------------------+
+<grid apply="it.amattioli.guidate.properties.CollectionPropertyComposer">
+    <custom-attributes propertyName="collectionProperty"/>
+</grid>
++---------------------------------------------------------+ 
+ 
++---------------------------------------------------------+
+<propertyGrid propertyName="collectionProperty"/>
++---------------------------------------------------------+
+
+ If you don't specify anything inside the "propertyGrid" component, like in the
+ latter example, the grid will have one column without header and the content
+ will be determined using the same type conversion algorithm used for the
+ propertyValue component.
+ 
+ If you need a more complex behavior you can specify columns and a row prototype:
+ 
++---------------------------------------------------------+
+<propertyGrid propertyName="collectionProperty">
+    <columns>
+	    <column width="50%" label="Description"/>
+	    <column width="50%" label="Q.ty" align="right"/>
+    </columns>
+    <rows>
+	    <rowPrototype>
+            <propertyValue propertyName="description" width="90%"/>
+            <propertyValue propertyName="quantity" width="90%"/>
+        </rowPrototype>
+    </rows>
+</propertyGrid>
++---------------------------------------------------------+  
+
+ The rowPrototype will assign each element of the collection as the back bean of
+ the corresponding row. In this way the propertyValue component will be bound to a
+ property of the collection element.
+ 
+ Following this principle you can even nest property grids using the master detail
+ feature of the ZK grid component:
+
++---------------------------------------------------------+
+<propertyGrid propertyName="collectionProperty">
+    <columns>
+    	<column width="10%"/>
+	    <column width="40%" label="Description"/>
+	    <column width="40%" label="Price" align="right"/>
+    </columns>
+    <rows>
+	    <rowPrototype>
+	        <detail>
+                <propertyGrid propertyName="nestedCollection">
+                    <columns>
+                        <column width="50%" label="Description"/>
+	                    <column width="50%" label="Q.ty" align="right"/>
+	                </columns>
+	                <rows>
+	                    <rowPrototype>
+	                        <propertyValue propertyName="description" width="90%"/>
+                            <propertyValue propertyName="quantity" width="90%"/>
+	                    </rowPrototype>
+	                </rows>
+                </propertyGrid>
+            </detail>
+            <propertyValue propertyName="description" width="90%"/>
+            <propertyValue propertyName="price" width="90%"/>
+        </rowPrototype>
+    </rows>
+</propertyGrid>
++---------------------------------------------------------+  
+
+ There are situations where informations can better be described by an image
+ rather than words. For example we can show a boolean value with two alternate
+ images. In this cases we can use the "imageProperty" composer:
+ 
++---------------------------------------------------------+
+<imageProperty propertyName="booleanProperty">
+    <valueImage src="img/true.gif" value="${true}"/>
+    <valueImage src="img/false.gif" value="${false}"/>
+</imageProperty>
++---------------------------------------------------------+
+
+ Generally speaking the imageProperty composer can be used when you have a property
+ that assumes a small set of predefined values like a boolean or an enumeration.
+ You have to give a "valueImage" for each possible value the property can assume.
+ The associated value must be indicated in the value attribute of the valueImage.
+
+** Editable properties
+
+ Properties can be edited too. To do this for a String property we can use a
+ "textProperty" component:
+ 
++---------------------------------------------------------+
+<textProperty propertyName="myProperty"/>
++---------------------------------------------------------+
+
+ Now the binding is bidirectional. Like for "propertyValue" the component is updated
+ when the property value changes but, if the user edit it, when the focus leaves the
+ component the property is set.
+ 
+ The component does validation on the property too. At this purpose it uses the DominATE
+ validation facility. If the back bean implements the Validator interface the component
+ uses its methods to validate the property value before setting it. The value is set in
+ the back bean only if validation succeeds.
+ 
+ If the back bean does not implement the Validator interface a DefaultValidator is used.
+
+ A special case is represented by the @Length Hibernate Validator annotation. If you
+ annotate your property with it, like in the following snippet:
+ 
++----------------------------------------------------------+
+@Length(max=20)
+public String getMyProperty() {
+    return myProperty;
+}
++----------------------------------------------------------+
+
+ a textProperty component bound to this property will have the maxlength attribute
+ set to the maximum length specified in the annotation so the user will not be able
+ to digit more than the given number of characters.
+ 
+ For properties of other types you have similar components:
+ 
+ * intProperty
+ 
+ * dateProperty
+ 
+ * decimalProperty
+ 
+ * timeIntervalProperty
+ 
+ []
+ 
+ The checkProperty component shows a checkbox bound to a boolean property in the
+ back bean. When the property is true the checkbox is checked, otherwise it is
+ unchecked.
+ 
+ The listProperty component is more complicated. Generally speaking it shows a listbox
+ but we need to distinguish various cases.
+ 
+ If the bound property is single-valued, like:
+ 
++----------------------------------------------------+
+public MyEntity getMyProperty() {
+    return myProperty;
+}
+
+public void setMyProperty(MyEntity value) {
+    myProperty = value;
+}
++----------------------------------------------------+
+ 
+ the listbox will allow the user to select a value from the list. Every time the user
+ select an item in the list the corresponding value will be set in the back bean.
+ 
+ If the bound property is a collection, like:
+ 
++----------------------------------------------------+
+public Collection<MyEntity> getMyProperty() {
+    return myProperty;
+}
+
+public void setMyProperty(Collection<MyEntity> values) {
+    myProperty = values;
+}
++----------------------------------------------------+ 
+ 
+ the listbox will be a multi-selection one. Every time the user select an item in the
+ list the entire set of the selected items will be set in the back bean.
+ 
+ The algorithm used to determine the list of items to display is the following:
+ 
+ * If in the back bean there is a getMyPropertyValues() method (where MyProperty must
+   be replaced with your property name), this method will be called to retrieve the
+   item list
+   
+ * If the base property class is an entity, the entity repository will be used to 
+   retrieve all the possible entities
+   
+ * If the base property class is an enum, all the enum values will be used
+ 
+ If the property is single-valued and is not annotated with @NotNull Hibernate
+ Validator annotation an empty row will be added to the top of the list to represent
+ the null value. 
+
+* Browsing views
+
+** List browsing
+
+ If your back bean is an object that implements the ListBrowser interface you can use the
+ "browserListbox" component to show its content.
+ 
+ Basically it is a ZK listbox. Its two forms are:
+ 
++----------------------------------------------------------------------+
+<listbox apply="it.amattioli.guidate.browsing.BrowserListboxComposer">
+   ......
+</listbox>
++----------------------------------------------------------------------+
+
++----------------------------------------------------------------------+
+<browserListbox>
+   ......
+</browserListbox>
++----------------------------------------------------------------------+
+
+ The items that will be shown will be each element of the list obtained calling the getList() method
+ on the back bean.
+
+ The listbox should have a listhead section and a listitemPrototype. The listitemPrototype is similar
+ in purpose to the rowPrototype we saw for the propertyGrid: it works like a prototype for each listitem
+ that will be visible in the listbox.
+ 
+ A complete example of browserListbox is:
+ 
++-----------------------------------------------------------------------+
+<browserListbox width="99%">
+    <listhead>
+        <listheader label="Name"/>
+        <listheader label="Surname"/>
+        <listheader label="Birth date"/>
+    </listhead>
+    <listitemPrototype>
+        <labelListcell propertyName="name"/>
+        <labelListcell propertyName="surname"/>
+        <labelListcell propertyName="birthdate"/>
+    </listitemPrototype>
+</browserListbox>
++-----------------------------------------------------------------------+
+
+ The "labelListCell" component is similar to the "propertyValue" one. If you prefer you can even use a standard
+ ZK listcell with one or more propertyValue inside it:
+ 
++-----------------------------------------------------------------------+
+<browserListbox width="99%">
+    <listhead>
+        <listheader label="Full Name"/>
+        <listheader label="Birth date"/>
+    </listhead>
+    <listitemPrototype>
+        <listcell>
+            <propertyValue propertyName="name"/>
+            <propertyValue propertyName="surname"/>
+        </listcell>
+        <labelListcell propertyName="birthdate"/>
+    </listitemPrototype>
+</browserListbox>
++-----------------------------------------------------------------------+
+
+ When the user select a row in the listbox the corresponding object in the browser is selected too.
+ Using getSelectedObject() in the browser allow you to retrieve this object.
+ 
+ Instead of the standard ZK "listheader" component you can use the browserListheader one. This component
+ allows automatic ordering of the browser content (calling the setOrder() method on the browser) each
+ time the user clicks on the column header. To specify the property name to be passed to the setOrder()
+ method you have two options:
+ 
+ * if you used a labelListcell component for the corresponding cell in the prototype the property name
+   is retrieved from its propertyName attribute
+   
+ * if you are not using a labelListcell or if you want to override what's in the labelListcell propertyName
+   attribute you can specify an orderColumn attribute in the browserListHeader
+   
+ []  
+ 
+ Here is an example:
+ 
++---------------------------------------------------------------------+
+<browserListbox width="99%">
+    <listhead>
+        <browserListheader label="Full Name" orderColumn="name"/>
+        <browserListheader label="Birth date"/>
+    </listhead>
+    <listitemPrototype>
+        <listcell>
+            <propertyValue propertyName="name"/>
+            <propertyValue propertyName="surname"/>
+        </listcell>
+        <labelListcell propertyName="birthdate"/>
+    </listitemPrototype>
+</browserListbox>
++---------------------------------------------------------------------+
+
+** Tree browsing
+
+ To show the content of a TreeBrowser you can use a standard ZK tree component with a BrowserTreeComposer
+ applied to it.
+
+** Browsing tools
+
+* Command views
+
+ Except in very simple cases, commands require some input from the user. For example, if your command
+ creates a new person it will need the name and surname.
+ 
+ So the most common pattern for command execution is: 
+ 
+ * the user press a button (or menu item, or something else)
+ 
+ * a window opens asking for some parameters
+ 
+ * the user press an "Ok" button to trigger command execution
+ 
+** Opening a Command Window 
+ 
+ Opening a window is a very simple task for every ZK programmer, but starting from JavATE 0.7 you have
+ a simpler option: the OpenWindowComposer class.
+ 
+ If you only need to open a window without passing attributes you can do:
+  
++--------------------------------+
+<button apply="it.amattioli.guidate.btns.OpenWindowComposer">
+  <custom-attributes windowUri="myWindow.zul"/>
+</button>
++--------------------------------+
+
+ If you need to pass parameters to the window you can use custom-attributes
+ with the "arg." prefix like in:
+  
++--------------------------------+
+<button apply="it.amattioli.guidate.btns.OpenWindowComposer">
+  <custom-attributes windowUri="myWindow.zul"
+                     arg.myParam="myValue"/>
+</button>
++--------------------------------+
+
+ The parameter value can be retrieved from a back-bean property using the
+ "propertyArg" prefix:
+  
++--------------------------------+
+<button apply="it.amattioli.guidate.btns.OpenWindowComposer">
+  <custom-attributes windowUri="myWindow.zul"
+                     propertyArg.myParam="myPropertyName"/>
+</button>
++--------------------------------+ 
+
+** CommandComposer
+
+ The opened window should use a particular subclass of BackBeanComposer called CommandComposer
+ that requires a back bean implementing the Command interface.
+ 
+ This composer listens to a couple of events:
+ 
+ * onDoCommand
+ 
+ * onCancelCommand
+ 
+ []
+ 
+ The first event will call the doCommand() method on the back bean and then it will close the window.
+ 
+ The onCancelCommand event will call the cancelCommand() method on the back bean and then it will close the window.
+ 
+ Typically these events will be forwarded by some buttons inside the window.
+ 
+ So the typical command window will look like the following:
+ 
++---------------------------------+
+<window title="New Person" border="normal" 
+        apply="it.amattioli.guidate.containers.CommandComposer">
+        
+    <custom-attributes backBean="createPersonCommand"/>
+        
+    <textProperty propertyName="name"/>
+    
+    <textProperty propertyName="surname"/>
+    
+    <hbox width="100%">
+        <button label="Ok"     forward="onDoCommand"/>
+        <button label="Cancel" forward="onCancelCommand"/>
+    </hbox>
+        
+</window>
++---------------------------------+
+
+** Editors
+
+ Your command could include a reusable editor. For example a CreateContractCommand could use a
+ PersonEditor for the customer:
+ 
++---------------------------------+
+public class CreateContractCommand implements Command {
+    ...
+    
+    public PersonEditor getCustomerEditor() {
+        ...
+    }
+    
+    ...
+}
++---------------------------------+
+
+ In this case you can nest back bean containers like in the following:
+ 
++---------------------------------+
+<window title="New Contract" border="normal" 
+        apply="it.amattioli.guidate.containers.CommandComposer">
+        
+    <custom-attributes backBean="createContractCommand"/>
+    
+    <vbox apply="it.amattioli.guidate.containers.BackBeanComposer">
+    
+        <custom-attributes backBean="parentBean.customerEditor"/>
+        
+        <textProperty propertyName="name"/>
+    
+        <textProperty propertyName="surname"/>
+    
+    </vbox>
+        
+</window>
++---------------------------------+
+
+ When GuidATE finds the spcial syntax "parentBean.xxx" in the backBean custom attribute it will
+ look for the bean defined in the outside container and it will get its "xxx" property. This will
+ be the actual back bean.
+ 
+ The two textProperty components defined inside the vbox will be bound to properties of the editor,
+ and not of the command.
+ 
+ If you use the same editor in multiple commands you can even define a macro-component and use it where
+ you want passing the property name as an argument. 
+ 
+ For example you can define in personEditor.zul :
+ 
++--------------------------------+
+<vbox apply="it.amattioli.guidate.containers.BackBeanComposer">
+    
+    <custom-attributes backBean="parentBean.${arg.propertyName}"/>
+    
+    <textProperty propertyName="name"/>
+
+    <textProperty propertyName="surname"/>
+
+</vbox>
++--------------------------------+
+
+ and in createContract.zul :
+ 
++---------------------------------+
+<?component name="personEditor" macroURI="personEditor.zul" inline="true"?>
+
+<window title="New Contract" border="normal" 
+        apply="it.amattioli.guidate.containers.CommandComposer">
+        
+    <custom-attributes backBean="createContractCommand"/>
+    
+    <personEditor propertyName="customerEditor"/>
+        
+</window>
++---------------------------------+ 
+
+ Reusable macro components can be more effectively defined in ZK lang-addon.xml configuration
+ file. Refer to ZK documentation for details. 
+
+*** List editors
+
+** Validation
+
+* Configuration
+
+** Simple configuration
+
+** Spring configuration
+
+* Type conversion

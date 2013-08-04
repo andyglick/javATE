@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-access="field" package="it.amattioli.dominate.hibernate">
+
+	<class name="FakeEntity" table="fake_table">
+
+		<id name="id" type="java.lang.Long">
+			<generator class="assigned"/>
+        </id>
+        
+        <version name="version"
+                 type="java.lang.Long"/>
+
+		<property name="description"/>
+		
+		<bag name="assoc" cascade="all">
+			<key column="fake_id" not-null="true"/>
+			<one-to-many class="AssociatedEntity"/>
+		</bag>
+		
+		<property name="enumerated">
+			<type name="it.amattioli.dominate.hibernate.types.EnumUserType">
+				<param name="enumClass">it.amattioli.dominate.hibernate.FakeEnum</param>
+			</type>
+		</property>
+		
+    </class>
+
+</hibernate-mapping>

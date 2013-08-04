@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<language-addon> 
+	<addon-name>GuidATE</addon-name>
+
+	<depends>zul,zkex,zkmax</depends>
+
+	<language-name>xul/html</language-name>
+
+	<component>
+	    <component-name>i3label</component-name>    
+	    <macro-uri>~./guidate/utils/i3label.zul</macro-uri>
+	    <inline>true</inline>    
+	</component>
+
+	<component>
+	    <component-name>textProperty</component-name>    
+	    <macro-uri>~./guidate/properties/textProperty.zul</macro-uri>
+	    <inline>true</inline>    
+	</component>
+
+	<component>
+	    <component-name>dateProperty</component-name>    
+	    <macro-uri>~./guidate/properties/dateProperty.zul</macro-uri>
+	    <inline>true</inline>    
+	</component>
+	
+	<component>
+	    <component-name>intProperty</component-name>    
+	    <macro-uri>~./guidate/properties/intProperty.zul</macro-uri>
+	    <inline>true</inline>    
+	</component>
+	
+	<component>
+	    <component-name>longProperty</component-name>    
+	    <macro-uri>~./guidate/properties/longProperty.zul</macro-uri>
+	    <inline>true</inline>    
+	</component>
+	
+	<component>
+	    <component-name>decimalProperty</component-name>    
+	    <macro-uri>~./guidate/properties/decimalProperty.zul</macro-uri>
+	    <inline>true</inline>    
+	</component>
+	
+	<component>
+	    <component-name>timeIntervalProperty</component-name>    
+	    <macro-uri>~./guidate/properties/timeIntervalProperty.zul</macro-uri>
+	    <inline>true</inline>    
+	</component>
+	
+	<component>
+	    <component-name>numericRangeProperty</component-name>    
+	    <macro-uri>~./guidate/properties/numericRangeProperty.zul</macro-uri>
+	    <inline>true</inline>    
+	</component>
+	
+	<component>
+	    <component-name>listProperty</component-name>    
+	    <macro-uri>~./guidate/properties/listProperty.zul</macro-uri>
+	    <inline>true</inline>    
+	</component>
+	
+	<component>
+	    <component-name>checkProperty</component-name>    
+	    <macro-uri>~./guidate/properties/checkProperty.zul</macro-uri>
+	    <inline>true</inline>    
+	</component>
+	
+	<component>
+	    <component-name>imageProperty</component-name>    
+	    <extends>image</extends>
+	    <component-class>it.amattioli.guidate.properties.ImageProperty</component-class>
+	    <apply>it.amattioli.guidate.properties.ImagePropertyComposer</apply>
+	</component>
+	
+	<component>
+	    <component-name>valueImage</component-name>    
+	    <macro-uri>~./guidate/properties/valueImage.zul</macro-uri>
+	    <inline>true</inline>    
+	</component>
+	
+	<component>
+	    <component-name>toggleProperty</component-name>    
+	    <extends>image</extends>
+	    <component-class>it.amattioli.guidate.properties.ImageProperty</component-class>
+	    <apply>it.amattioli.guidate.properties.TogglePropertyComposer</apply>
+	</component>
+	
+	<component>
+	    <component-name>entityProperty</component-name>    
+	    <macro-uri>~./guidate/properties/entityProperty.zul</macro-uri>
+	    <inline>true</inline>    
+	</component>
+	
+	<component>
+	    <component-name>propertyValue</component-name>    
+	    <macro-uri>~./guidate/properties/propertyValue.zul</macro-uri>
+	    <inline>true</inline>    
+	</component>
+	
+	<component>
+	    <component-name>propertyGrid</component-name>    
+	    <extends>grid</extends>
+	    <component-class>it.amattioli.guidate.properties.PropertyGrid</component-class>
+	    <apply>it.amattioli.guidate.properties.CollectionPropertyComposer</apply>    
+	</component>
+	
+	<component>
+	    <component-name>browserGrid</component-name>    
+	    <extends>grid</extends>
+	    <component-class>it.amattioli.guidate.properties.PropertyGrid</component-class>
+	    <apply>
+	    	it.amattioli.guidate.properties.CollectionPropertyComposer,
+	    	it.amattioli.guidate.browsing.GridSortComposer
+	    </apply>
+	    <custom-attribute>
+	    	<attribute-name>propertyName</attribute-name>
+	    	<attribute-value>list</attribute-value>
+	    </custom-attribute>    
+	</component>
+	
+	<component>
+	    <component-name>browserColumn</component-name>    
+	    <macro-uri>~./guidate/browsing/browserColumn.zul</macro-uri>
+	    <inline>true</inline>    
+	</component>
+	
+	<component>
+	    <component-name>browserListbox</component-name>
+	    <extends>listbox</extends>
+	    <apply>it.amattioli.guidate.browsing.BrowserListboxComposer</apply>
+	</component>
+	
+	<component>
+	    <component-name>groupBrowserListbox</component-name>
+	    <extends>listbox</extends>
+	    <apply>it.amattioli.guidate.browsing.GroupBrowserListboxComposer</apply>
+	</component>
+	
+	<component>
+	    <component-name>browserListheader</component-name>    
+	    <macro-uri>~./guidate/browsing/browserListheader.zul</macro-uri>
+	    <inline>true</inline>    
+	</component>
+	
+	<component>
+	    <component-name>listitemPrototype</component-name>
+	    <extends>listitem</extends>
+	    <apply>it.amattioli.guidate.collections.PrototypeComposer</apply>
+	</component>
+	
+	<component>
+	    <component-name>listgroupPrototype</component-name>
+	    <extends>listgroup</extends>
+	    <apply>it.amattioli.guidate.collections.GroupPrototypeComposer</apply>
+	</component>
+	
+	<component>
+	    <component-name>rowPrototype</component-name>
+	    <extends>row</extends>
+	    <apply>it.amattioli.guidate.collections.PrototypeComposer</apply>
+	</component>
+	
+	<component>
+	    <component-name>labelListcell</component-name>    
+	    <macro-uri>~./guidate/properties/labelListcell.zul</macro-uri>
+	    <inline>true</inline>    
+	</component>
+	
+	<component>
+	    <component-name>editorListbox</component-name>
+	    <extends>listbox</extends>
+	    <apply>it.amattioli.guidate.editing.EditorListboxComposer</apply>
+	</component>
+	
+	<component>
+	    <component-name>editorGrid</component-name>
+	    <extends>grid</extends>
+	    <apply>it.amattioli.guidate.editing.EditorGridComposer</apply>
+	</component>
+
+</language-addon> 

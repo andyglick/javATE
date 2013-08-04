@@ -1,0 +1,232 @@
+JavATE 0.7 New Features
+
+  This is a brief description of the major new features in JavATE 0.7
+  
+  Refer to the {{{../changelog.html#a0.7}Changelog}} for a complete list.
+  
+* Enhanced Spring support
+
+  In JavATE 0.6 we introduced {{{newFeatures-0_6.html}Spring support}}. Instead of developing the service factory
+  by hand now we can use Spring to do the same thing.
+  
+  But for general application we are still stuck with a config.properties file like the
+  following:
+  
++----------------------------------------------+
+it.amattioli.guidate.repositoryFactoryClass = it.amattioli.dominate.hibernate.HibernateRepositoryFactory
+it.amattioli.guidate.applicateSessionClass = it.amattioli.applicate.sessions.ApplicateSession
+it.amattioli.guidate.serviceFactoryClass = net.sourceforge.sibylla.service.ServiceFactory
+it.amattioli.guidate.applicateSessionVariable = applicateSession
++----------------------------------------------+
+
+  In JavATE 0.7 you can use Spring for general application configuration too. GuidATE will
+  first look for an application.cfg.xml file. If it is present it will use it for Spring
+  configuration, otherwise it will look for the old config.properties file.
+  
+  The Spring configuration file equivalent to the previous exmple is:
+  
++----------------------------------------------+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	
+    <bean id="applicateSession" class="it.amattioli.applicate.sessions.ApplicateSession" scope="prototype">
+        <property name="serviceFactory">
+            <bean class="net.sourceforge.sibylla.service.ServiceFactory"/>
+        </property>
+    </bean>
+
+    <bean id="repositoryRegistry" class="it.amattioli.dominate.RepositoryRegistry">
+        <property name="repositoryFactoryClass" 
+                  value="it.amattioli.dominate.hibernate.HibernateRepositoryFactory"/>
+    </bean>
+
+</beans>
++----------------------------------------------+ 
+
+  It's quite lengthy! So why you should use it? Because allows you to configure things 
+  you could not configure with the property file.
+  
+  A simple example is the configuration of the Spring service factory. Instead of subclassing
+  SpringServiceFactory, like described in JavATE 0.6 New Features article, now you can do
+  something like this in application.cfg.xml:
+  
++----------------------------------------------+
+    <bean id="applicateSession" class="it.amattioli.applicate.sessions.ApplicateSession" scope="prototype">
+        <property name="serviceFactory">
+            <bean class="it.amattioli.springate.SpringServiceFactory">
+                <constructor-arg value="/it/amattioli/footsteps/services/service-config.xml"/>
+            </bean>
+        </property>
+    </bean>
++----------------------------------------------+
+
+  A more complex example is command undo. You can configure the ApplicATE session for undo
+  support with:
+  
++----------------------------------------------+
+    <bean id="applicateSession" class="it.amattioli.applicate.sessions.ApplicateSession" scope="prototype">
+        <property name="serviceFactory">
+            <bean class="net.sourceforge.sibylla.service.ServiceFactory"/>
+        </property>
+        <property name="commandExecutor">
+            <bean class="it.amattioli.applicate.commands.executors.UndoableExecutor"/>
+        </property>
+    </bean>
++----------------------------------------------+
+
+  In the same way you can create your own executor and configure the session so to use it.
+  
+  To use Spring support don't forget to include the SpringATE jar file and its dependencies
+  in your application. If you are using Maven you can do it adding
+  
++----------------------------------------------+
+<dependency>
+    <groupId>it.amattioli</groupId>
+    <artifactId>springate</artifactId>
+    <version>0.7</version>
+</dependency>
++----------------------------------------------+
+
+  to your pom.xml
+
+* Multi-attribute sorting
+
+  List browsers now have a new method called addOrder(). Calling this method you can add a new property
+  on which you want ordering.
+  
+  In GuidATE the "browserListheader" custom ZK component has been enhanced: ctrl-clicking on a column
+  header now you add the corresponding property to the ordering.
+
+* Numeric Range
+
+  In EncapsulATE there is a new NumericRangeFormat class that allows formatting and parsing ranges
+  of numbers.
+  
+  For example you can parse things like:
+  
+  * 1 - 10
+  
+  * 1 ... 10
+  
+  * 100 ... (more than 100)
+  
+  * ...100 (less than 100)
+  
+  In GuidATE there's a new ZK custom component called "numericRangeProperty" that you can bind to
+  a numeric range property of a bean.
+  
+  For example, if your back-bean is a command (or any other service) with:
+  
++----------------------------------------+
+  public Range<Long> getMyProp() {
+      return myProp;
+  }
+  
+  public void setMyProp(Range<Long> value) {
+      myProp = value;
+  }
++----------------------------------------+
+
+  in your zul file you can write:
+  
++----------------------------------------+
+  <numericRangeProperty propertyName="myProp"/>
++----------------------------------------+
+
+* Enhanced time interval formatting
+
+  In EncapsulATE the old it.amattioli.encapsulate.dates.TimeIntervalFormat has been deprecated and 
+  replaced by the new, more flexible it.amattioli.encapsulate.dates.format.TimeIntervalFormat .
+  
+  This new class is able to parse things like:
+  
+  * February
+  
+  * March-June/2010
+  
+  * monday - wednesday
+  
+  []
+  
+  At this moment the supported languages are English and Italian.
+  
+  In GuidATE the timeIntervalProperty custom ZK component has been modified in order to use this new
+  implementation.
+
+* Generic bean specification
+
+  Composite specifications are a very powerful and flexible way to specify conditions on a complex entity.
+  
+  But sometimes you need a specification on a very simple bean. In this cases now you can use the
+  BeanSpecification class.
+  
+  BeanSpecification is a DynaBean that has the same properties of the entity for which you are creating
+  a specification.
+  
+  Suppose you have a "Person" entity with firstName and lastName attributes. You can do the following:
+  
++--------------------------------+
+BeanSpecification<Person> spec = new BeanSpecification<Person>(Person.class);
+PropertyUtils.setProperty(spec, "firstName", "Andrea");
+PropertyUtils.setProperty(spec, "lastName", "Mattioli");
++--------------------------------+
+
+  At this moment BeanSpecification supports the following types of properties:
+  
+  * Strings
+  
+  * Enums
+  
+  * Entity references
+  
+  []
+
+* Internationalized labels
+
+  In plain ZK an intenationalized label has a quite lengthy syntax. You have to write something like:
+
++--------------------------------+
+<label value="${c:l('labelKey')}"/>
++--------------------------------+
+
+  Now you can do the same with a really short syntax:
+  
++--------------------------------+
+<i3label value="labelKey"/>
++--------------------------------+
+
+* OpenWindow composer
+
+  Developing a button or menu item that open a new ZK window passing some parameters is a very common task.
+  
+  Now you can simplify this operation using the OpenWindowComposer class.
+  
+  If you only need to open a window without passing attributes you can do:
+  
++--------------------------------+
+<button apply="it.amattioli.guidate.btns.OpenWindowComposer">
+  <custom-attributes windowUri="myWindow.zul"/>
+</button>
++--------------------------------+
+
+  If you need to pass parameters to the window you can use custom-attributes
+  with the "arg." prefix like in:
+  
++--------------------------------+
+<button apply="it.amattioli.guidate.btns.OpenWindowComposer">
+  <custom-attributes windowUri="myWindow.zul"
+                     arg.myParam="myValue"/>
+</button>
++--------------------------------+
+
+  The parameter value can be retrieved from a back-bean property using the
+  "propertyArg" prefix:
+  
++--------------------------------+
+<button apply="it.amattioli.guidate.btns.OpenWindowComposer">
+  <custom-attributes windowUri="myWindow.zul"
+                     propertyArg.myParam="myPropertyName"/>
+</button>
++--------------------------------+

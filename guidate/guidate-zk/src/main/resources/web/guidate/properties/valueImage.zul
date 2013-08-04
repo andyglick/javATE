@@ -1,0 +1,4 @@
+<image>
+	<custom-attributes value="${arg.value}"/>
+	<attribute if="${arg.src != null}" name="src">${arg.src}</attribute>
+</image>

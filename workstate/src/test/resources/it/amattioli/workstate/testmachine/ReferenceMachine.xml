@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Machine tag="State/Activity Model" id="uiModel">
+  <Events>
+	<Event tag="SuperEvento1" id="E1"/>
+  </Events>
+  <States>
+	<SimpleState tag="SuperStato3" id="G.6">
+      <EntryAction/>
+	  <ExitAction/>
+	  <Attribute initial="&quot;Stato3.jsp&quot;" class="String" tag="url"/>
+	</SimpleState>
+	<ReferenceState tag="SuperStato2" id="G.5" ref="it/amattioli/workstate/testmachine/ReferencedMachine.xml">
+      <EntryAction/>
+	  <ExitAction/>
+	  <Attribute initial="&quot;Stato2.jsp&quot;" class="String" tag="url"/>
+	</ReferenceState>
+    <SimpleState tag="SuperStato1" id="G.4">
+      <EntryAction/>
+	  <ExitAction/>
+	  <Attribute initial="&quot;Stato1.jsp&quot;" class="String" tag="url"/>
+	</SimpleState>
+    <InitialState id="G.2"/>
+  </States>
+  <Transitions>
+	<ExternalTransition end="G.6" start="G.5" id="T3">
+      <Guard/>
+      <Action/>
+    </ExternalTransition>
+    <ExternalTransition end="G.4" start="G.2" id="T1">
+      <Guard/>
+      <Action/>
+    </ExternalTransition>
+	<ExternalTransition end="G.5" start="G.4" id="T2" event="E1">
+      <Guard/>
+      <Action/>
+    </ExternalTransition>
+  </Transitions>
+</Machine>

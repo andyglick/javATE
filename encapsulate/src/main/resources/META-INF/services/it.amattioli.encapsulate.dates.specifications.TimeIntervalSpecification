@@ -1,0 +1,3 @@
+it.amattioli.encapsulate.dates.specifications.DefaultTimeIntervalSpecification
+it.amattioli.encapsulate.dates.specifications.CriteriaTimeIntervalSpecification
+it.amattioli.encapsulate.dates.specifications.HqlTimeIntervalSpecification

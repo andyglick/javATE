@@ -1,0 +1,520 @@
+A custom repository with JavATE
+
+* Introduction
+
+ For one of my customers I developed a billing system using {{{http://www.javate.amattioli.it}JavATE}}. 
+ The application is backed by a MySQL database that is accessed using the default JavATE persistence
+ system:  {{{http://www.hibernate.org}Hibernate}}. I deployed it on a Linux box running 
+ {{{http://tomcat.apache.org}Tomcat}}. 
+ 
+ After some time the customer decided to acquire a sort of issue tracking system and 
+ said that the billing system needed to read the tracked items to create bills.
+ 
+ Unfortunately the issue tracking system was developed using Microsoft technology so it
+ was deployed on a completely different server. The only way to go seemed to use some
+ sort of web services. The issue tracking system exposed a Soap web service that allows
+ us to read its main three entities:
+ 
+ * Projects
+ 
+ * Items
+ 
+ * Customers
+ 
+ []
+ 
+ Each Project has one Customer and a set of Items.
+ 
+ It seems a good starting point for developing a custom repository!
+ 
+* The Web Service Client
+ 
+ Using the {{{http://mojo.codehaus.org/axistools-maven-plugin/}Axis Maven plugin}}, developing 
+ the Web Service Client was as simple as:
+ 
+ * putting the WSDL in the src/main/wsdl directory
+ 
+ * referencing the Axis Maven Plugin in the project pom.xml
+ 
+ * running mvn axistools:wsdl2java
+ 
+ []
+ 
+ We obtained:
+ 
+ * a set of data transfer objects: ProjectDto, ItemDto, CustomerDto
+ 
+ * a service locator class: TmServiceLocator
+ 
+ * a service interface with a method for each exposed service: TmServiceSoap
+ 
+ * a service stub, but we will always call its methods using the interface  
+ 
+* The Repository
+ 
+ We needed to develop a repository for each entity.
+ 
+ First of all we developed an abstract super class with a service() method that use the axis
+ generated service locator to build the services client and all the stuff for handling ordering
+ a paging.
+ 
++------------------------------------------------------------------------+
+public abstract class AbstractSoapRepository<E extends Entity<String>> implements Repository<String,E> {
+    private URL portAddress;
+    private int first;
+    private int last = Integer.MIN_VALUE;
+    private String orderProperty;
+    private boolean reverseOrder;
+	
+    public AbstractSoapRepository(String portAddress) {
+        try {
+            this.portAddress = new URL(portAddress);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected TmServiceSoap service() {
+        TmServiceLocator locator = new TmServiceLocator();
+        try {
+            return locator.getTmServiceSoap(portAddress);
+        } catch (ServiceException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    @Override
+    public void setFirst(int first) {
+        this.first = first;
+    }
+
+    @Override
+    public int getFirst() {
+        return first;
+    }
+
+    @Override
+    public void setLast(int last) {
+        this.last = last;
+    }
+
+    @Override
+    public int getLast() {
+        return last;
+    }
+
+    @Override
+    public void setOrder(final String property, final boolean reverse) {
+        this.orderProperty = property;
+        this.reverseOrder = reverse;
+    }
+
+    @Override
+    public String getOrderProperty() {
+        return orderProperty;
+    }
+
+    @Override
+    public boolean isReverseOrder() {
+        return reverseOrder;
+    }
+	
+    protected List<E> postProcessResult(List<E> values) {
+        if (orderProperty != null) {
+            Collections.sort(values, new GenericComparator<E>(orderProperty));
+            if (reverseOrder) {
+                Collections.reverse(values);
+            }
+        }
+        int firstIdx = first;
+        if (firstIdx > values.size()) {
+             firstIdx = Math.max(0, values.size());
+        }
+        int lastIdx = last + 1;
+        if (lastIdx <= 0 || lastIdx > values.size()) {
+            lastIdx = values.size();
+        }
+        if (lastIdx < firstIdx) {
+            lastIdx = firstIdx;
+        }
+        return values.subList(firstIdx,lastIdx);
+    }
+}
++------------------------------------------------------------------------+  
+ 
+ Notice the postProcessResult() method. This method will be called by the listing methods
+ of the repository to order the collection obtained by the web services and to apply
+ page limits. 
+ 
+ Exception handling is not so good because I want to maintain the focus on the repository.
+ 
+ There were services for retrieving entities by Id, so developing the get() method of each
+ repository is straightforward. I'll show the ProjectRepository one:
+ 
++------------------------------------------------------------------------+
+public class SoapProjectRepository extends AbstractTmSoapRepository<Project> {
+	
+    @Override
+    public Project get(String id) {
+        ProjectDto p;
+        try {
+            p = service().getProject(id);
+        } catch (RemoteException e) {
+            throw new RuntimeException("Error reading project id: " + id, e);
+        }
+        return new Project(p);
+    }
++------------------------------------------------------------------------+ 
+ 
+ It's better not to use the DTOs as our entities so I developed a Project, Customer and Item
+ class like the following:
+ 
++------------------------------------------------------------------------+
+public class Project implements Entity<String> {
+	private String id;
+	private String description;
+	
+	.....
+	
+    public Project(ProjectDto dto) {
+        this.id = dto.getId();
+        description = dto.getDescription();
+        .....
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getDescription() {
+       return description;
+    }
+
+    ....
+
+}
++------------------------------------------------------------------------+
+ 
+ As we said above the project is associated to a customer. This is interesting to develop as we can
+ implement a lazy loading mechanism.
+ 
+ Doing it in JavATE is very simple:
+ 
++------------------------------------------------------------------------+
+    ....
+    
+    private Customer customer;
+    
+    public Project(ProjectDto dto) {
+        id = dto.getId();
+        description = dto.getDescription();
+        .....
+        customer = LazyEntity.newInstance(Customer.class, dto.getCustomerId());
+    }
+
++------------------------------------------------------------------------+
+
+ This will fill the customer attribute with a CGLIB proxy that will load the entity
+ from the Customer repository only when needed.
+ 
+ There are services to get a list of entities given some filters so developing the list()
+ method in the repository is as simple as developing the get() one:
+ 
++------------------------------------------------------------------------+
+    @Override
+    public List<Project> list() {
+        ArrayOfProjectDto projects;
+        try {
+            projects = service().listProjects(null);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+        List<Project> result = new ArrayList<Project>();
+		for (ProjectDto curr: projects.getProjectDto()) {
+			result.add(new Project(curr));
+		}
+        return result;
+    }
++------------------------------------------------------------------------+
+
+* The Specifications   
+
+ But in the repository there is also a list() method that takes a specification.
+ This requires a bit more work.
+  
+ The web services that return a list of entities take a list of filters. Each filter
+ has a property name, an operator ("=", "<>" or "like"), a value, and a boolean connector
+ with the previous filter (And / Or). In this way you can fulfill queries like:
+  
++-----------------------------------------------------------------------+
+description like 'HELLO%' and customerId = 'ABCDEFG'
++-----------------------------------------------------------------------+
+
+ Unfortunately parenthesis were not allowed.
+ 
+ What we need is something that can transform a JavATE specification into a list of filters
+ for our issue tracking services. We need a JavATE assembler like the following:
+ 
++-----------------------------------------------------------------------+
+public class TmSoapAssembler implements Assembler {
+	private Stack<String> stackedConnectors = new Stack<String>();
+	private List<TmFilter> filters = new ArrayList<TmFilter>();
+	
+	@Override
+	public void startConjunction() {
+		stackedConnectors.push("AND");
+	}
+	
+	@Override
+	public void endConjunction() {
+		stackedConnectors.pop();
+	}
+
+	@Override
+	public void startDisjunction() {
+		stackedConnectors.push("OR");
+	}
+
+	@Override
+	public void endDisjunction() {
+		stackedConnectors.pop();
+	}
+
+	public void addFilter(String field, String operator, String value) {
+		String connector = "";
+		connector = stackedConnectors.peek();
+		filters.add(new TmFilter(operator, value, field, connector));
+	}
+	
+	public ArrayOfTmFilter getFilters() {
+		return new ArrayOfTmFilter(filters.toArray(new TmFilter[0])); 
+	}
+}
++-----------------------------------------------------------------------+ 
+
+ Our repository will instantiate an object of this class and pass it to the assembleQuery() method
+ of the specification that is responsible for the transformation of the specification in something
+ that the web services can understand. 
+ 
+ Inside it, Composite specifications will call the start/end Conjunction/Disjunction methods of the
+ assembler to signal we are inside a group of filters that need to be connected using "And" or "Or".
+ 
+ The specifications we are going to develop, instead, will call addFilter() to put a specific filter 
+ in the list.
+ 
+ At the end of the assembleQuery() method the repository can retrieve the list of filters using the
+ getFilters() method and call the web service:
+ 
++-----------------------------------------------------------------------+
+    @Override
+    public List<Project> list(Specification<Project> spec) {
+        TmSoapAssembler soapAssembler = new TmSoapAssembler();
+        spec.assembleQuery(soapAssembler);
+        ArrayOfTmFilter filters = soapAssembler.getFilters();
+        ArrayOfProjectDto projects;
+        try {
+            projects = service().listProjects(filters);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+        List<Project> result = new ArrayList<Project>();
+		for (ProjectDto curr: projects.getProjectDto()) {
+			result.add(new Project(curr));
+		}
+        return result;
+    }
++-----------------------------------------------------------------------+
+
+ Now we need to develop the specifications. For example the string specification can be:
+ 
++-----------------------------------------------------------------------+
+public class SoapStringSpecification<T extends Entity<?>> extends StringSpecification<T> {
+
+    public SoapStringSpecification(String propertyName) {
+        super(propertyName);
+    }
+
+    public SoapStringSpecification(String propertyName, StringSpecification<T> chained) {
+        super(propertyName, chained);
+    }
+
+    @Override
+    public void itselfAssembleQuery(Assembler assembler) {
+        if (wasSet()) {
+            String operator = null;
+            String value = null;
+            switch (getComparisonType()) {
+            case CONTAINS:
+                operator = "like";
+                value = "%" + getValue() + "%";
+            case EXACT:
+                operator = "=";
+                value = getValue();
+            case STARTS:
+                operator = "like";
+                value = "%" + getValue() + "%";
+            }
+           ((TmSoapAssembler)assembler).addFilter(getPropertyName(), operator, value);
+        }
+    }
+
+    @Override
+    public boolean itselfSupportsAssembler(Assembler assembler) {
+        return assembler instanceof TmSoapAssembler;
+    }
+
+}
++-----------------------------------------------------------------------+
+
+ In JavATE StringSpecification is developed as a chained specification. This means that every time we get
+ an instance of StringSpecification we really obtain a chain of classes each responsible for talking
+ with a particular kind of assembler. In the itselfSupportAssembler() method we are testing if the
+ assembler is of the right type for us.
+ In the itselfAssembleQuery we can be sure that the passed assembler is a TmSoapAssembler because we
+ tested it before.
+ 
+ With a similar technique we can develop other kind of specifications like ObjectSpecification and
+ EntitySpecification.
+ 
+ Then we need to inform JavATE that our new developed specifications need to be chained when a specification
+ is instantiated. This can be done with a property file like this:
+ 
++-----------------------------------------------------------------------+
+it.amattioli.dominate.specifications.StringSpecifications.tmSoap = it.amattioli.reparticle.TmSoapStringSpecification
+it.amattioli.dominate.specifications.ObjectSpecifications.tmSoap = it.amattioli.reparticle.TmSoapObjectSpecification
+....
++-----------------------------------------------------------------------+
+
+ that need to be registered before using the specifications:
+ 
++-----------------------------------------------------------------------+
+SpecificationsConfig.addSpecificationConfig("/it/amattioli/reparticle/soapSpecifications.properties");
++-----------------------------------------------------------------------+
+
+ This can be done, for example, in some application initialization section.
+ 
+ Using the list(Specification) method we can develop the getByPropertyValue() method too. The
+ code should be self explanatory:
+ 
++-----------------------------------------------------------------------+
+public T getByPropertyValue(String propertyName, Object value) {
+    ObjectSpecification<T> spec = ObjectSpecification.newInstance(propertyName);
+    spec.setValue(value);
+    List<T> all = list(spec);
+    if (all.isEmpty()) {
+        return null;
+    } else {
+        return all.get(0);
+    }
+}
++-----------------------------------------------------------------------+ 
+ 
+ There are no web services for writing entities on the tracking services so the only thing we
+ can do in the put() and remove() methods is to throw an UnsupportedOperationException.
+ 
+* Lazy collections 
+ 
+ We said that a Project owns a collection of Item, so we need some method in the Project entity
+ to retrieve that collection. To do it in an efficient way we can use the LazyList class.
+ 
+ This class works in a similar way to the LazyEntity we saw for the "Project to Customer" association
+ but it is not so simple to use. While LazyEntity always retrieve the proxied entity using its Id,
+ LazyList needs some piece of code to do the job. So LazyList is an abstract class that must be
+ overridden to implements its findTarget() method.
+ 
++----------------------------------------------------------------------+
+public class ProjectItemsList extends LazyList<Item> {
+    private String projectId;
+	
+    public ProjectItemsList(String projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
+    protected List<Item> findTarget() {
+        Repository<String, Item> rep = RepositoryRegistry.instance().getRepository(Item.class);
+        ObjectSpecification spec = ObjectSpecification.newInstance("projectId");
+        spec.setValue(projectId);
+        return rep.list(spec);
+    }
+
+}
++----------------------------------------------------------------------+
+ 
+ Now that we have this class we can use it in the Project constructor:
+ 
++----------------------------------------------------------------------+
+    public Project(ProjectDto dto) {
+        id = dto.getId();
+        description = dto.getDescription();
+        .....
+        items = new ProjectItemsList(id);
+    }
++----------------------------------------------------------------------+
+ 
+* The repository factory
+
+  If you tried to use the code we developed so far you should have noticed a problem
+  with the lazy loaded objects.
+  
+  This because they try to retrieve the repositories for Project, Item and Customer
+  from the repository registry, but they are not there!
+  
+  What we have to do is to create a repository factory and inject it into the repository
+  registry. 
+  
++----------------------------------------------------------------------+
+public class SoapRepositoryFactory extends MemoryRepositoryFactory {
+
+    public Repository<String, Matter> getMatterRepository() {
+        return new SoapMatterRepository();
+    }
+
+    public Repository<String, Billing> getBillingRepository() {
+        return new SoapBillingRepository();
+    }
+
+    public Repository<String, Contact> getContactRepository() {
+        return new SoapContactRepository();
+    }
+
+}
++----------------------------------------------------------------------+
+
+  If you only want to use these three repositories you can call
+  
++----------------------------------------------------------------------+
+  RepositoryRegistry.instance().setRepositoryFactoryClass(SoapRepositoryFactory.class);
++----------------------------------------------------------------------+ 
+
+  If you need to use these repositories with other repositories of different
+  type you can use a CompositeRepositoryFactory like in
+  
++----------------------------------------------------------------------+
+public class CustomRepositoryFactory extends CompositeRepositoryFactory {
+
+    public CustomRepositoryFactory() {
+        addFactory(new AccountingRepositoryFactory());
+        addFactory(new SoapRepositoryFactory());
+   }
+		
+}
++----------------------------------------------------------------------+
+
+  and then
+  
++----------------------------------------------------------------------+
+  RepositoryRegistry.instance().setRepositoryFactoryClass(CustomRepositoryFactory.class);
++----------------------------------------------------------------------+ 
+
+* Conclusions
+
+  JavATE offers out of the box support for Hibernate-based and In-Memory repositories but
+  if you need to access other kind of data-stores you can develop your own repository
+  in a very simple way.
+  
+  It is also not difficult to create new types of repositories for very popular data-stores.
+  I'm thinking to LDAP directories, JCR repositories or No-SQL databases. Developers are
+  encouraged to develop these plug-ins and to make them available as OSS.
+  
+  If you want to participate contact the JavATE developers on the forum.  

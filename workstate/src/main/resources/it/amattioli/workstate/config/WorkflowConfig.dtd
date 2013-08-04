@@ -1,0 +1,62 @@
+<!ELEMENT Machine (Events,States,Transitions)>
+  <!ATTLIST Attribute owner CDATA #REQUIRED>
+
+<!ELEMENT Attribute EMPTY>
+  <!ATTLIST Attribute tag CDATA #REQUIRED>
+  <!ATTLIST Attribute class CDATA #REQUIRED>
+  <!ATTLIST Attribute initial CDATA #IMPLIED>
+
+<!ELEMENT States (SequentialState)>
+
+<!ELEMENT SequentialState (SequentialState+, SimpleState+, ConcurrentState+, JunctionPoint+, InitialState, FinalState?, EntryAction?, ExitAction?, Attribute*)>
+  <!ATTLIST SequentialState id CDATA #REQUIRED>
+  <!ATTLIST SequentialState tag CDATA #REQUIRED>
+  
+<!ELEMENT ConcurrentState (SequentialState+, EntryAction?, ExitAction?, Attribute*)>
+  <!ATTLIST ConcurrentState id CDATA #REQUIRED>
+  <!ATTLIST ConcurrentState tag CDATA #REQUIRED>
+  
+<!ELEMENT SimpleState (EntryAction?, ExitAction?, Attribute*)>
+  <!ATTLIST SimpleState id CDATA #REQUIRED>
+  <!ATTLIST SimpleState tag CDATA #REQUIRED>
+  
+<!ELEMENT InitialState EMPTY>
+  <!ATTLIST InitialState id CDATA #REQUIRED>
+  
+<!ELEMENT FinalState EMPTY>
+  <!ATTLIST FinalState id CDATA #REQUIRED>
+  
+<!ELEMENT ReferenceState (EntryAction?, ExitAction?, Attribute*)>
+  <!ATTLIST ReferenceState id CDATA #REQUIRED>
+  <!ATTLIST ReferenceState tag CDATA #REQUIRED>
+  <!ATTLIST ReferenceState ref CDATA #REQUIRED>
+  
+<!ELEMENT JunctionPoint EMPTY>
+  <!ATTLIST JunctionPoint id CDATA #REQUIRED>
+  
+<!ELEMENT EntryAction (#PCDATA)>
+
+<!ELEMENT ExitAction (#PCDATA)>
+
+
+<!ELEMENT Events (Event*)>
+
+<!ELEMENT Event (Attribute*)>
+  <!ATTLIST Event id CDATA #REQUIRED>
+  <!ATTLIST Event tag CDATA #REQUIRED>
+
+
+<!ELEMENT Transitions (ExternalTransition*, InternalTransition*)>
+
+<!ELEMENT ExternalTransition (Action?, Guard?)>
+  <!ATTLIST ExternalTransition event CDATA #REQUIRED>
+  <!ATTLIST ExternalTransition start CDATA #REQUIRED>
+  <!ATTLIST ExternalTransition end CDATA #REQUIRED>
+  
+<!ELEMENT InternalTransition (Action?, Guard?)>
+  <!ATTLIST InternalTransition event CDATA #REQUIRED>
+  <!ATTLIST InternalTransition state CDATA #REQUIRED>
+  
+<!ELEMENT Action (#PCDATA)>
+
+<!ELEMENT Guard (#PCDATA)>

@@ -1,0 +1,4 @@
+it.amattioli.encapsulate.dates.specifications.DefaultDateSpecification
+it.amattioli.encapsulate.dates.specifications.CriteriaDateSpecification
+it.amattioli.encapsulate.dates.specifications.HqlDateSpecification
+it.amattioli.encapsulate.dates.specifications.JpaqlDateSpecification

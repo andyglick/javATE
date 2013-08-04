@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?><archetype>
+  <id>javate-zk</id>
+  <resources>
+  	<resource>src\main\resources\hibernate.cfg.xml</resource>
+    <resource>src\main\resources\it\amattioli\guidate\config\config.properties</resource>
+    <resource>src\main\webapp\WEB-INF\web.xml</resource>
+    <resource>src\main\webapp\WEB-INF\zk.xml</resource>
+  </resources>
+</archetype>

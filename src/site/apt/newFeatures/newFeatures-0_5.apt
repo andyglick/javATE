@@ -1,0 +1,54 @@
+JavATE 0.5 New Features
+
+  This is a brief description of the major new features in JavATE 0.5
+  
+  Refer to the {{{../changelog.html#a0.5}Changelog}} for a complete list.
+
+* Entity Groups
+
+  There are situations where makes sense accessing entities grouped in some way.
+  
+  For example we could group persons by birth year.
+  
+  In these cases we can use the new DominATE EntityGroup class. Objects of this class 
+  represents groups of entities that share the fact of satisfying a specification.
+
+* Group Browser
+
+  To navigate through a set of entity groups and their members there is the new
+  ApplicATE GroupBrowser. You can also select entities in a group or an entire
+  group.
+  
+  Group browsers are supported in GuidATE by the new groupBrowserListbox custom
+  component.
+
+* Property availability and writability
+
+  Now you can dynamically specify if a property is available or writable adding
+  to a bean a method called "isPropertyNameWritable" or "isPropertyNameAvailable"
+  where PropertyName must be replaced with the name of the property you are controlling.
+  
+  This method must return a boolean: true if the property is available/writable, false
+  otherwise.
+  
+  GuidATE will use this methods, if they are present. If a property is not available the
+  corresponding GuidATE features (propertyValue, textProperty, listProperty, etc.) will
+  be hidden. If a property is not writable the corresponding GuidATE features will be
+  read-only.
+
+* Resettable commands
+
+  Prior to version 0.5, an ApplicATE command cannot be reused after it has been executed.
+  Now commands can implement the Resettable interface so they can be resetted calling
+  the reset() method after the doCommand(). In the reset() method you can implement the
+  code you need to make the command available for another execution.
+  
+  TransactionalCommandContext is aware of this new method so it can reset the underlying
+  session to your persistence management service.  
+
+* Lazy entities and collections
+
+  DominATE has pre-built support for Hibernate persisted entities, but developers can
+  develop new repositories for accessing other kinds of data stores. To simplify the
+  development of lazy-loaded entities and collections of entities DominATE now has
+  the new LazyEntity and LazyList classes. 

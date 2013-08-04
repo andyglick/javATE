@@ -1,0 +1,108 @@
+JavATE 0.6 New Features
+
+  This is a brief description of the major new features in JavATE 0.6
+  
+  Refer to the {{{../changelog.html#a0.6}Changelog}} for a complete list.
+  
+* Spring support
+
+ JavATE ApplicATE services have always supported the concept of dependency injection.
+ 
+ When you create a ListBrowser object you have to inject a repository into it and it's
+ not uncommon for a JavATE developer to build command that needs an editor or a selector
+ to be injected.
+ 
+ But until now the developers needed to write by hand their own service factory.
+ 
+ Now you can leverage the power {{{http://www.springsource.org/}of Spring}} for the same
+ purpose.
+ 
+ To do it:
+ 
+ * include the new SpringATE module jar in your project
+ 
+ * extends the SpringServiceFactory class like in the following example
+ 
++-------------------------------------------------------------------+
+public class ServiceFactory extends SpringServiceFactory {
+
+    public ServiceFactory() {
+        super("/it/amattioli/footsteps/services/service-config.xml");
+    }
+
+}
++-------------------------------------------------------------------+ 
+
+ At this point you can use your spring-based service factory setting this class in your
+ GuidATE configuration file:
+ 
++-------------------------------------------------------------------+
+    it.amattioli.guidate.serviceFactoryClass = it.amattioli.footsteps.services.ServiceFactory
++-------------------------------------------------------------------+
+
+ Obviously you have to create the service-config.xml file containing your services definition.
+ 
+ The SpringServiceFactory automatically includes a base configuration file containing a
+ set of beans that you can use. In the following example you can see how to configuare
+ a list browser with its own specification and long-running context:
+ 
++--------------------------------------------------------------------+
+<bean id="projectsBrowser" parent="longRunningContext" scope="prototype">
+    <constructor-arg>
+        <bean class="it.amattioli.applicate.browsing.ListBrowserImpl" scope="prototype">
+            <constructor-arg value="it.amattioli.footsteps.model.projects.Project"/>
+            <property name="specification">
+                <bean class="it.amattioli.footsteps.model.projects.ProjectSpecification" scope="prototype"/>
+            </property>
+        </bean>
+    </constructor-arg>
+</bean>
++--------------------------------------------------------------------+ 
+
+ and the following is a command with transactional context:
+ 
++--------------------------------------------------------------------+
+<bean id="projectEditor" parent="transactionalContext" scope="prototype">
+    <constructor-arg>
+        <bean class="it.amattioli.applicate.commands.HibernateEntityEditor" scope="prototype">
+            <constructor-arg value="it.amattioli.footsteps.model.projects.Project"/>
+        </bean>
+    </constructor-arg>
+</bean>
++--------------------------------------------------------------------+
+
+* Command undo
+
+ One of the best-known use of the {{{http://en.wikipedia.org/wiki/Command_pattern}command pattern}} is 
+ the implementation of multi-level undo. JavATE 0.6 now has built-in support for it.
+ 
+ To support undo ApplicATE slightly changed the way commands get executed.
+ 
+ Now the ApplicateSession class has a execute(Command cmd) method that you can use
+ to excute a command instead of calling its doCommand() method directly.
+ 
+ To execute a command the ApplicateSession use a command executor that you can inject in
+ the session. By default an executor is used that simply call the command doCommand()
+ method.
+ 
+ To use undo you have to inject an instance of the UndoableExecutor class. 
+ 
+ To support undo your command must implement the UndoableCommand interface. In its undo()
+ method you have to develop the code that is able to undo what the doCommand() method
+ did.
+ 
+ If your command has been executed by an ApplicateSession that is using an UndoableExecutor
+ to undo it simply execute an UndoCommand instance in the same way:
+ 
++--------------------------------------------------------------------------+
+    ApplicateSession session = new ApplicateSession();
+    session.setCommandExecutor(new UndoableExecutor());
+    ......
+    session.execute(new MyCommand());
+    ......
+    session.execute(new UndoCommand());
++--------------------------------------------------------------------------+
+
+ The new command executor has been developed for undo purposes but can be used in a lot
+ of ways. For example you can develop your own executor that execute a command in an
+ asynchronous way.

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+
+  <properties>
+    <title>About JavATE GuidATE</title>
+  </properties>
+  
+  <body>
+
+    <section name="About JavATE GuidATE">
+
+	  	<p>
+	  	The GUI Driver for Application Tiered Engine has the responsibility to bind the 
+	  	user interface to the application layer. At this moment only a 
+	  	<a href="http://www.zkoss.org">ZK</a> implementation is under active development 
+	  	but there are plans for Swing and GWT implementations.
+	  	</p>
+	  	
+	  	<p>
+  		Read the <a href="description.html">GuidATE User Guide</a>
+  		</p>
+
+    </section>
+
+  </body>
+
+</document>

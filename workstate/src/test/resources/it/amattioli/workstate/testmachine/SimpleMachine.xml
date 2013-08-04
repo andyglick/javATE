@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Machine tag="State/Activity Model" id="uiModel">
+  <Events>
+	<Event tag="Event1" id="E1"/>
+  </Events>
+  <States>
+	<SimpleState tag="Stato2" id="G.5">
+      <EntryAction/>
+	  <ExitAction/>
+	  <Attribute initial="&quot;Stato2.jsp&quot;" class="String" tag="url"/>
+	</SimpleState>
+    <SimpleState tag="Stato1" id="G.4">
+      <EntryAction/>
+	  <ExitAction/>
+	  <Attribute initial="&quot;Stato1.jsp&quot;" class="String" tag="url"/>
+	</SimpleState>
+    <InitialState id="G.2"/>
+  </States>
+  <Transitions>
+    <ExternalTransition end="G.4" start="G.2" id="T1">
+      <Guard/>
+      <Action/>
+    </ExternalTransition>
+	<ExternalTransition end="G.5" start="G.4" id="T2" event="E1">
+      <Guard/>
+      <Action/>
+    </ExternalTransition>
+  </Transitions>
+</Machine>

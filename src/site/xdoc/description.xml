@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+
+  <properties>
+    <title>Welcome to JavATE</title>
+  </properties>
+
+  <body>
+
+    <section name="Welcome to JavATE">
+		
+		<div id="newsbox">
+			<h3>News</h3>
+			
+			<h5>Oct 15th 2011</h5>
+			<span>JavATE 0.8 has been released. Look at the <a href="newFeatures/newFeatures-0_8.html">new features</a></span><br/>
+			<a href="changelog.html#a0.8">Change-log</a><br/>
+			<a href="http://sourceforge.net/projects/javate/files/javate/javate-0.8/javate-0.8.zip/download">Download</a>
+			
+			<h5>Mar 11th 2011</h5>
+			<span>JavATE 0.7 has been released. Look at the <a href="newFeatures/newFeatures-0_7.html">new features</a></span><br/>
+			<a href="changelog.html#a0.7">Change-log</a><br/>
+			<a href="http://sourceforge.net/projects/javate/files/javate/javate-0.7/javate-0.7.zip/download">Download</a>
+			
+			<h5>Oct 12th 2010</h5>
+			<span>JavATE wants you!</span><br/>
+			<span>If you are a Spring expert and you want to contribute to this open source project contact me on the <a href="http://sourceforge.net/projects/javate/forums/forum/866170">Open Discussion Forum</a></span>
+			
+			<h5>Sep 20th 2010</h5>
+			<span>JavATE 0.6 has been released. Look at the <a href="newFeatures/newFeatures-0_6.html">new features</a></span><br/>
+			<a href="changelog.html#a0.6">Change-log</a><br/>
+			<a href="http://sourceforge.net/projects/javate/files/javate/javate-0.6/javate-0.6.zip/download">Download</a>
+			
+			<h5>Apr 27th 2010</h5>
+			<span>A new article: <a href="articles/repositories.html">A custom repository with JavATE</a></span>
+			
+			<h5>Mar 30th 2010</h5>
+			<span>JavATE 0.5.1 has been released. Look at the <a href="newFeatures/newFeatures-0_5.html">new features</a></span><br/>
+			<a href="changelog.html#a0.5.1">Change-log</a><br/>
+			<a href="http://sourceforge.net/projects/javate/files/javate/javate-0.5.1/javate-0.5.1.zip/download">Download</a>
+			
+			<h5>Nov 16th 2009</h5>
+			<span>JavATE 0.4 Released</span><br/>
+			<a href="changelog.html#a0.4">Change-log</a>
+			
+			<h5>Oct 29th 2009</h5>
+			<span>A new subproject about State Charts will soon be released. 
+			      Preview it in this new <a href="workstateExample.html">example</a>.</span>
+			
+			<h5>Sep 15th 2009</h5>
+			<span>Article about JavATE published on ZK site. <a href="http://docs.zkoss.org/wiki/ZK_and_JavATE">Read it!</a></span>
+			
+			<h5>Aug 9th 2009</h5>
+			<span>JavATE 0.3 Released</span><br/>
+			<a href="changelog.html#a0.3">Change-log</a>
+			
+		</div>
+		
+		<script src="http://platform.linkedin.com/in.js" type="text/javascript"></script>
+		<script type="IN/Share" data-url="www.javate.amattioli.it" data-counter="right"></script>
+		
+		<p>
+		JavATE, the Java Application Tiered Engine is a set of <a href="license.html">open source</a> Java libraries 
+		that enables application development using domain driven methodology.
+		It gives you standard interfaces and implementations for the <a href="http://domaindrivendesign.org/">domain driven
+		design (DDD)</a> building blocks like Entity, Repository, Specification, ecc. So you can focus on your strategic 
+		design instead of reinventing the wheel of the building blocks each time.
+  		</p>
+  
+  		<p>
+  		JavATE is not a web-framework itself because it is based on existing frameworks 
+  		like <a href="http://www.zkoss.org">ZK</a>. And it is not only related to web-applications, 
+  		you can use it to develop desktop applications and web-services and ...
+  		</p>
+  
+  		<p>
+  		JavATE is not a Object-Relational-Mapping tool itself because it is based on 
+  		existing ORM technologies like <a href="http://www.hibernate.org">Hibernate</a> (already) 
+  		or JPA (not yet implemented). And you can use it to develop applications that 
+  		are backed by <a href="articles/mongodb.html">MongoDB</a>, JCR repositories, ...
+  		</p>
+  
+  		<p>
+  		JavATE is a sort of glue between all these technologies! 
+  		</p>
+  
+  		<p>
+  		Look at <a href="example.html">this example</a> for a hands-on introduction to the basic 
+  		features of the framework.
+		</p>
+		
+		<p>
+		The core of JavATE is composed of the following building blocks:
+  		</p>
+  		
+  		<ul>
+  			<li> <a href="../dominate/index.html">DominATE</a>, for domain modeling</li>
+  
+  			<li> <a href="../applicate/index.html">ApplicATE</a>, for application services</li>
+  
+  			<li> <a href="../guidate/index.html">GuidATE</a>, for graphical user interfaces</li>
+  		</ul>
+  
+  		<p>
+  		but there are other libraries like <a href="../workstate/index.html">WorkstATE</a>, a 
+  		fully configurable Java State Chart implementation. And others will come.
+  		</p>
+
+		<p>  
+  		Let us know your opinions about JavATE on our 
+  		<a href="http://sourceforge.net/forum/forum.php?forum_id=866170">Open Discussion Forum</a>.
+		</p>
+		
+    </section>
+
+  </body>
+
+</document>

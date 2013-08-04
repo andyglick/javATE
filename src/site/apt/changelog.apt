@@ -1,0 +1,612 @@
+JavATE Change-Log
+
+* JavATE {0.8}
+
+** New Features
+
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3372700}3372700}} Context management refactoring 	
+  
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3371758}3371758}} Transaction management in SessionManager 
+  
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3327479}3327479}} Remove specification 
+  
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3322891}3322891}} Bound collection decorator 
+  
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3321867}3321867}} Indexed property adapter 
+  
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3309745}3309745}} Editing an indexed property 
+  
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3302481}3302481}} Spring configuration in one file only 
+  
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3302137}3302137}} Set command listeners using Spring 
+  
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3297904}3297904}} There should be a way to replace Hibernate configuration 
+  
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3293178}3293178}} Enhanced SpringServiceFactory constructor 
+  
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3288869}3288869}} Upgrade to SLF4J 1.6 
+  
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3284366}3284366}} Enable/Disable SelectionSupport 
+  
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3234321}3234321}} Use ServiceLoader for specifications 
+  
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3194960}3194960}} Use ServiceLoader for SessionManager definitions 
+  
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3165189}3165189}} Sorting propertyGrid 
+  
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3160629}3160629}} Hibernate custom types should log parameters
+
+** Bugs
+
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3376575}3376575}} Wrong message in ApplicATE ConcurrencyException
+
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3357645}3357645}} AvailableComposer has inverted behaviour
+
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3357643}3357643}} AvailableComposer cannot find "visible" property
+
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3356037}3356037}} NestedNullException in OpenWindowComposer
+
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3324000}3324000}} Mockito dependency should have test scope
+
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3299931}3299931}} Editor selection does not work with ZK 5
+
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3299879}3299879}} Wrong query with HqlAssembler
+
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3299838}3299838}} EntitySelectorComposer doesn't works with ZK 5
+
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3294403}3294403}} DefaultTreeBrowser should degrade gracefully if root is null
+
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3294392}3294392}} DefaultTreeBrowser should notify listeners if root changed
+
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3287283}3287283}} EntitySelectorComposer does not work without backbean
+
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3285373}3285373}} GenericTimeInteral does not implement Serializable
+
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3284428}3284428}} Too many selection notifications in DefaultTreeBrowser
+
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3257779}3257779}} BrowsingToolComposer works only with authorizATE
+
+* JavATE {0.7}
+
+** New Features
+
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3189160}3189160}} Let RepositoryFactory be injected into RepositoryRegistry
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3173728}3173728}} Use enhanced TimeIntervalFormat in TimeIntervalProperty
+  
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3172582}3172582}} Service enhancer
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3164225}3164225}} Enhanced TimeIntervalFormat
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3163228}3163228}} Change row composer
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3160738}3160738}} Composite specifications factory methods
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3157265}3157265}} Factory methods for ListBrowserImpl
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3116651}3116651}} Internationalized label
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3107981}3107981}} NumericRangeProperty
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3107963}3107963}} NumericRangeFormat
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3106598}3106598}} Develop generic bean specification
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3103721}3103721}} OpenWindowComposer
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3078089}3078089}} MultyPropertyComparator
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3075565}3075565}} Add canDeleteRowMethod() to ListEditor interface
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3043604}3043604}} DeleteRowComposer visibility
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3043603}3043603}} ListEditor should implement Selector
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3043602}3043602}} Selector should be more generic
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3037756}3037756}} Multi-attribute sorting in BrowserListbox
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3037755}3037755}} Multi-attribute sorting in list browsers
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3037752}3037752}} Multi-attribute sorting in repositories
+ 
+  * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3026750}3026750}} Configure command executor in ApplicationInit
+
+** Bugs
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3182045}3182045}} ClassHibernateRepository.list() ignores cacheable
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3167814}3167814}} Constants in ConventionalDuration should be final
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3164865}3164865}} HqlComparabelSpecification does not use alias correctly
+  
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3164833}3164833}} Error in AbstractRange.toString()
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3161902}3161902}} equals without hashcode
+  
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3160637}3160637}} Duplicate component-name in lang-addon.xml
+  
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3160088}3160088}} CompositeSpecification does not consider wasSet() result
+  
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3158026}3158026}} Missing methods in AbstractRepositoryBridge
+  
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3157420}3157420}} ValueItemRenderer does not consider Described objects
+  
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3141202}3141202}} Property validated even if not available
+  
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3110181}3110181}} Archetype does not include hibernate.cfg.xml
+  
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3105902}3105902}} Inconsistency in StringSpecification
+  
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3103680}3103680}} WritableComposer does not support listProperty
+
+* JavATE {0.6}
+
+** New Features
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3042954}3042954}} Event logging
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3041932}3041932}} RepositoryEditor constructor
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3036622}3036622}} new rowRenderer for GridEditor
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3028289}3028289}} Negated specification
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3026721}3026721}} Use CommandExecutor in GuidATE
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3026719}3026719}} Command executor
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3022526}3022526}} ObjectBrowserImpl constructor taking class instead of repository
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3011567}3011567}} NullCommand
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3011070}3011070}} Default values in EntitySelector constructors
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3009427}3009427}} EditorTreeComposer should listen on PropertyChange
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3009425}3009425}} PropertyChange on TreeEditor
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3007332}3007332}} propertyIndex as String
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3007256}3007256}} ConvetionalTimeInterval should have method to create range
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3007254}3007254}} DiscreteRange should implement Iterable
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3005415}3005415}} Add isRelease() to the SessionManager interface
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=3003910}3003910}} ComparisonType I18N
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2999969}2999969}} ListBrowserIm constructor taking class instead of repository
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2988290}2988290}} DateSpecification enhancement
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2984419}2984419}} Range operations
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2984418}2984418}} ConventionalDuration constructor
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2975109}2975109}} Code duplication in ExternalEntity
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2934279}2934279}} Selection by specification
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2883316}2883316}} Money specifications
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2163326}2163326}} Undo
+
+** Bugs
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3047214}3047214}} DefaultUser does not override hashcode() and equals()
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3036618}3036618}} row prototype retrieving in EditorGridComposer
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3034397}3034397}} NullPointerException in MoneyHibernateType
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3008981}3008981}} StackOverflow in BeanEditorImpl
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3008631}3008631}} Listbox selection on model change
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3008468}3008468}} Wrong BeanEditorImpl behaviour
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3007809}3007809}} PropertyAvailabilityRetriever does not work when delegate
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3007415}3007415}} NPE in AnnotationsRetrieverImpl when indexed property
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=3000513}3000513}} NPE in AuthorizateComposer.isVisible()
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2992858}2992858}} LazyEntity loads entity on finalize() call
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2989975}2989975}} Javassist proxies not supported
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2988439}2988439}} TimeIntervalHibernateType does not support nulls
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2979190}2979190}} ObjectSpecification exception
+
+* JavATE {0.5.1}
+
+** Bugs
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2976100}2976100}}  Beanshell dependency  	 
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2975801}2975801}}  Cannot find bundle for Yes/No converter 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2974050}2974050}}  Cannot initialize workstate ErrorMessages 	
+
+* JavATE {0.5}
+
+** New Features
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2973313}2973313}}  LazyList
+    	 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2973304}2973304}} 	LazyEntity
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2971470}2971470}} 	Default repository factory
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2970589}2970589}} 	Collection repository factory
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2969473}2969473}}  ComparableSpecification
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2969380}2969380}} 	Subject in AuthorizateComposer
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2968604}2968604}} 	LongProperty
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2958041}2958041}} 	Parametric addRow() in ListEditor
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2951292}2951292}} 	Remove problematic dependencies
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2949034}2949034}} 	GuidATE support for GroupBrowser
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2949031}2949031}} 	GroupBrowser
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2946669}2946669}} 	Money.sumProperty enhancement
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2945349}2945349}} 	Custom joins in HqlAssembler
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2941124}2941124}} 	Iterables on months and days
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2940171}2940171}} 	Alias name for entity in hql specification
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2928284}2928284}} 	Upgrade to Hibernate 3.3
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2926320}2926320}} 	Upgrade to BeanUtils 1.8.2
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2914838}2914838}} 	ComparisonType in LongSpecification
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2914052}2914052}} 	Upgrade to Hibernate 3.2.7
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2912053}2912053}} 	Use local description in guidate
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2912052}2912052}} 	Localized descriptions
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2912047}2912047}} 	Locale converter
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2901197}2901197}} 	Resettable commands
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2893294}2893294}} 	isVisible behaviour in AuthorizateComposer
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2884837}2884837}} 	BeanShell specification
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2884576}2884576}} 	Multiple prototypes
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2858144}2858144}} 	Property writability
+  	
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2858142}2858142}} 	Property availability
+
+** Bugs
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2971991}2971991}}  ListEditorImpl.deleteRow() always returns null 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2971987}2971987}}  Cannot instantiate ExclusionListSpecification 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2961983}2961983}}  HqlAssembler generates wrong query 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2960762}2960762}}  listProperty does not support typeConverter 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2959731}2959731}}  CollectionHibernateRepository.list(Specification) error 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2958790}2958790}}  HqlDateSpecification does not set alias 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2957312}2957312}}  Don't perform validation on read-only fields 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2957308}2957308}}  ArrayIndexOutOfBoundException in ClassHibernateRepository 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2954985}2954985}}  Unmatched parenthesis generated by HqlAssembler 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2949665}2949665}}  DateSpecification does not support unbonded intervals 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2939422}2939422}}  ClassHibernateRepository.get() should use Session.get() 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2938509}2938509}}  ObjectBrowserImpl does not compile outside eclipse 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2926196}2926196}}  Bean validation returns property validation messages 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2922398}2922398}}  ComparisonType not propagated in LongSpecification 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2922345}2922345}}  Error in MemoryRepository when wrong limits 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2922322}2922322}}  PagedListBrowser is in wrong page after applying spec 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2918804}2918804}}  HQLStringSpecification is case sensitive 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2917140}2917140}}  TimeIntervalSpecification.setIncludingInterval does not work 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2908166}2908166}}  NPE in EntitySelectorComposer 	
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2903662}2903662}}  EntitySelector ignores additional specifications 	
+
+* JavATE {0.4}
+ 
+** New Features
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2894483}2894483}}  Configurable comparison type in EntitySelector
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2893280}2893280}} 	Browser interface
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2890918}2890918}} 	MetaState visitors
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2890212}2890212}} 	Setting Hibernate configuration resource
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2887783}2887783}} 	More flexible authorization operation
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2882201}2882201}} 	TreeEditor selection on focus
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2881825}2881825}} 	TreeEditor addSibling()
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2872488}2872488}} 	MachineSpecification
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2869683}2869683}} 	Machine hibernate type
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2868240}2868240}} 	Use enum as state type in ConfigBuilder
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2860090}2860090}} 	Parent bean reference
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2858650}2858650}} 	Toggle button
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2856695}2856695}} 	Lazy loading in ExternalEntityUserType
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2849954}2849954}} 	Duration refactoring
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2849780}2849780}} 	MoneyHibernateType
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2849060}2849060}} 	Parametrized EnumUserType
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2848536}2848536}} 	TimeInterval specification
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2848535}2848535}} 	TimeInterval hibernate type
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2844905}2844905}} 	CompositeSpecification constructors
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2841896}2841896}} 	EntitySelector
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2836102}2836102}} 	Use generics in workstate
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2831987}2831987}} 	ComparisonType descriptions
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2820342}2820342}} 	Upgrade to ZK 3.6.2
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2818716}2818716}} 	Pluggable specification categories
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2809916}2809916}} 	Wizard
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2710355}2710355}} 	Session manager generalization
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2432938}2432938}} 	ExternalEntity Hibernate Type 
+ 
+** Bugs
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2893429}2893429}}  ListRepository content not update
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2890405}2890405}} 	Persisted machine is not updated
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2890377}2890377}} 	Machine tag is ignored
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2886409}2886409}} 	Two binding on a single component
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2884870}2884870}} 	Region final state
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2881824}2881824}} 	TreeEditor doesn't notify selection listeners
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2881779}2881779}} 	Wrong item is removed from tree editor
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2881775}2881775}} 	Wrong item backBean for tree editors
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2874786}2874786}} 	Error in TimeIntervalSpecification
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2873440}2873440}} 	EntitySelector doesn't listen to bound property changes
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2873434}2873434}} 	No chained constructor in HQL specifications
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2872996}2872996}} 	Error creating EnumSpecification
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2868825}2868825}} 	InvocationTargetException in LongRunningContext
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2868728}2868728}} 	Possible memory leak
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2865700}2865700}} 	Error in PagedListBrowser
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2860569}2860569}} 	NPE when gridEditor inside another gridEditor
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2859989}2859989}} 	ConcurrentModificationException in PropertyChangeSupport
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2859989}2858658}} 	ListEditorImpl doesn't fire property change event
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2856807}2856807}} 	label attribute in checkProperty
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2851318}2851318}} 	PagedListBrowserImpl doesn't fire property change
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2846252}2846252}} 	ObjectBrowserImpl not completely released
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2841078}2841078}} 	ListBrowserImpl does not implement PropertyChangeEmitter
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2840254}2840254}} 	Tree doesn't fire onOpenSelectedItem
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2839641}2839641}} 	Money.summProperty() does not support nulls
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2839040}2839040}} 	ClassCastException in EntitySpecification
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2838870}2838870}} 	AbstractRepositoryBridge does not implements Repository
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2828995}2828995}} 	BeanValidatorComposer
+
+* JavATE {0.3}
+
+** New Features
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2829155}2829155}} TreePath
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2828463}2828463}} Bridged repository
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2826039}2826039}} setRootId in TreeBrowser
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2823134}2823134}} TreeEditor
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2821765}2821765}} BrowsingToolComposer compatible with ObjectBrowser
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2819112}2819112}} alsoApply
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2819017}2819017}} ObjectBrowser as Selector
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2817938}2817938}} No results if specification values are not set
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2807761}2807761}} AbstractBeanEditor
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2804754}2804754}} SmartTab closing
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2804752}2804752}} ObjectBrowser release
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2801793}2801793}} Standalone ObjectBrowser
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2798424}2798424}} Usage of grid as ListEditor view
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2793044}2793044}} Validation refactoring
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2788050}2788050}} ListEditor refactoring
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2787070}2787070}} Add rowPrototype custom tag
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2785654}2785654}} Separate interface from implementation for ListEditor
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2783729}2783729}} ExclusionListSpecification
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2782734}2782734}} Upgrade to ZK 3.6.1
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2720921}2720921}} AuthorizATE
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2646660}2646660}} Repository.getByAttribute()
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2355354}2355354}} Selectable browsers
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2308443}2308443}} Tree browser
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2200237}2200237}} Properties dependency
+
+** Bugs
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2828313}2828313}} property validator di guidate
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2827678}2827678}} TreeBrowser not refreshed
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2827313}2827313}} Annotations retrieving when enhanced by cglib
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2826564}2826564}} backBean in propertyGrid
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2826035}2826035}} NullPointerException in BrowserTreeComposer
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2821321}2821321}} listProperty inverts meaning of @NotNull
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2820780}2820780}} Problem with AbstractBeanEditor
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2818611}2818611}} hql date specification parameters
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2817934}2817934}} Error in MultiBrowser
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2817472}2817472}} selezione col multibrowser
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2804877}2804877}} SessionManager has been released
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2799511}2799511}} ListEditorImpl context
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2798421}2798421}} CommandComposer can't find backBean
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2796873}2796873}} ClassCastException in ObjectSpecification
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2796447}2796447}} BrowserListbox selection
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2795462}2795462}} ListProperty cannot be used inside listbox
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2794756}2794756}} HQL specifications don't check if were set
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2794438}2794438}} Hibernate queries ignore setFirst and setLast
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2793923}2793923}} checkBox does not support null in "checked" property
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2793909}2793909}} HQL queries do not support special characters
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2790155}2790155}} HQL queries do not support ordering
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2789135}2789135}} ClassCastException in LongSpecification
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2789091}2789091}} Parameters are not set in HQL queries
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2789076}2789076}} Various errors in HQL queries
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2788999}2788999}} ListBrowserImpl does not receive specification events
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2787068}2787068}} propertyValue tag doesn't support typeConverter attr
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2786686}2786686}} labelListcell tag doesn't support typeConverter attr
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2784252}2784252}} IndexOutOfBoundException in ListBrowserImpl
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2784250}2784250}} NPE in ListBrowserImpl.select
+
+* JavATE {0.2}
+
+** New Features
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2762655}2762655}} Fire property change in ListBrowserImpl
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2750276}2750276}} BigDecimal handling
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2750169}2750169}} ImageProperty custom tag
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2723472}2723472}} Conversion format in custom tags
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2686501}2686501}} Recursive SameContext
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2609400}2609400}} ListEditor revisited
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2592466}2592466}} ListEditor deleteRow
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2581259}2581259}} Applicate session scope
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2581097}2581097}} findTargetBackBean
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2496089}2496089}} getDetailsBrowser in ObjectBrowser
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2478637}2478637}} Remove from repository
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2429347}2429347}} ValidatingComposer
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2275461}2275461}} Custom components
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109806&aid=2216044}2216044}} Custom converters
+
+** Bugs
+
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2737527}2737527}} Validable elements inside editorListbox are not registered
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2722037}2722037}} Cascading property change
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2721814}2721814}} PropertyValuesComposer with entities
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2689764}2689764}} Too many CommandEvents in ListBrowserImpl
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2689172}2689172}} ListBrowserModel not updated
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2634212}2634212}} CommandEvent not fired when command cancelled
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2633831}2633831}} TransactionaCommand.addCommandListener
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2605490}2605490}} IntConverter and Long values
+ 
+ * {{{http://sourceforge.net/tracker/?func=detail&group_id=239418&atid=1109803&aid=2585228}2585228}} Serious performance problem
+ 

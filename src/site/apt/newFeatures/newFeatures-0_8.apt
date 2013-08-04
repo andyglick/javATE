@@ -1,0 +1,59 @@
+JavATE 0.8 New Features
+
+  This is a brief description of the major new features in JavATE 0.8
+  
+  Refer to the {{{../changelog.html#a0.8}Changelog}} for a complete list.
+  
+* MongoDB and JCR support
+  
+  JavATE has always supported object persistence using relational databases but, as
+  stated in the home page of the project, it is not limited to it.
+  You were always able to create your own implementation of the Repository and Specification
+  interface to access your own persistence system.
+  JavATE 0.8 now introduce out of the box support for two different storage systems:
+  
+  * {{{http://www.mongodb.org}MongoDB}}
+  
+  * {{{http://en.wikipedia.org/wiki/Content_repository_API_for_Java}JCR (Java Content Repository)}} API implementations
+  
+  For a natural integration of these systems JavATE requires a sort of Object Mapping system.
+  Fortunately both has some sort of it.
+  For MongoDB we used {{{http://code.google.com/p/morphia/}Morphia}}, for JCR we 
+  used {{{http://jackrabbit.apache.org/object-content-mapping.html}Jackrabbit Object Content Mapping}}.
+  
+  If you are interested there is a complete {{{../articles/mongodb.html}article}} on how to 
+  use JavATE with MongoDB/Morphia.  
+  
+* Bound Collection Decorator
+
+  The new BoundCollectionDecorator class of DominATE is a decorator for collections that 
+  fires an event every time the collection or one of its elements is modified.
+ 
+  If a collection is decorated with this class when the add() or remove() method is called 
+  a CollectionChangeEvent is fired and every CollectionChangeListener registered using the 
+  addCollectionChangeListener() method is notified. The same happens every time one of the 
+  elements of the collection fires a PropertyChangeEvent.
+  
+  You can use it, for example, to simplify the firing of PropertyChangeEvent of a calculated 
+  property that depends on the content of a collection (i.e. the summary value in an invoice).  
+
+* Indexed Property Adapter
+
+  Most of the time developers don't give direct access to a property but encapsulate it
+  behind a set of methods. This is true for collections too.
+  
+  This gives you the possibility to modify the implementation of these methods but there
+  are clients that wants a collection as input.
+  
+  In this cases the IndexedPropertyAdapter class gives you the possibility to have
+  collection like access to a property with the following naming pattern:
+  
+  * reading method: getPropertyName(int index)
+  
+  * add row method: addPropertyName(PropertyClass toBeAdded)
+  
+  * delete row method: removePropertyName(PropertyClass toBeRemoved) 
+  
+
+  
+

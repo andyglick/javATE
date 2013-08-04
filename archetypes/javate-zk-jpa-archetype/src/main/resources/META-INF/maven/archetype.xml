@@ -1,0 +1,10 @@
+<archetype>
+  <id>javate-zk-jpa-archetype</id>
+  <resources>
+  	<resource>src\main\resources\application.cfg.xml</resource>
+    <resource>src\main\resources\service-config.xml</resource>
+    <resource>src\main\resources\META-INF\persistence.xml</resource>
+    <resource>src\main\webapp\WEB-INF\web.xml</resource>
+    <resource>src\main\webapp\WEB-INF\zk.xml</resource>
+  </resources>
+</archetype>

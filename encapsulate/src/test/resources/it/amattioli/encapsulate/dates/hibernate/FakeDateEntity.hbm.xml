@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-access="field" package="it.amattioli.encapsulate.dates.hibernate">
+
+	<class name="FakeDateEntity" table="fake_date_table">
+
+		<id name="id" type="java.lang.Long">
+			<generator class="assigned"/>
+        </id>
+        
+        <version name="version"
+                 type="java.lang.Long"/>
+
+		<property name="day" type="it.amattioli.encapsulate.dates.hibernate.DayHibernateType"/>
+		
+		<property name="date"/>
+		
+		<property name="interval" type="it.amattioli.encapsulate.dates.hibernate.TimeIntervalHibernateType">
+			<column name="LOW"/>
+			<column name="HIGH"/>
+		</property>
+		
+    </class>
+
+</hibernate-mapping>

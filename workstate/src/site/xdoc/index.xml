@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+
+  <properties>
+    <title>About JavATE WorkstATE</title>
+  </properties>
+  
+  <body>
+
+    <section name="About JavATE WorkstATE">
+		
+	  	<p>
+  		WorkstATE is an implementation of a State Charts engine compatible with UML and 
+  		configurable both in Java code and XML.
+	  	</p>
+	  	
+	  	<p>
+	  	Look at the following <a href="workstateExample.html">example</a> for details.
+	  	</p>
+
+    </section>
+
+  </body>
+
+</document>

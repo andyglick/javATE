@@ -1,0 +1,959 @@
+A basic example
+
+* Our goals
+
+  We want to develop a little example web application backed by a relational database using JPA and ZK.
+  All the application will do is to let the user browse through a list of persons
+  and let him create a new one and edit existing ones.
+  
+  The domain model is left very very simple so the reader can focus on the basic
+  principles of the framework. In the Advanced Example you will find a (little bit)
+  more complicated domain. 
+  
+* Before starting
+
+  JavATE is based on Java 6 so be sure to have JDK 6 (or 7) installed on your machine.
+  
+  The tutorial will use {{{http://maven.apache.org}Maven}} to build the project. 
+  If you prefer another build system there are special hooks for you when needed.
+  
+* Create the application skeleton
+
+  JavATE has a Maven archetype for this kind of projects so it is really simple to set up the tutorial
+  project. 
+  
+  From the command line 
+  
++------------------------------------------------------------------+
+mvn archetype:create -DarchetypeGroupId=it.amattioli.archetypes -DarchetypeArtifactId=javate-zk-jpa-archetype -DarchetypeVersion=1.0 -DgroupId=mygroup -DartifactId=myartifact
++------------------------------------------------------------------+
+
+  or, in Eclipse, you can search for the "javate-zk-jpa-archetype" archetype when you create a new
+  Maven project.
+  
+  The project skeleton that is created follows the Maven style so Java sources will be
+  in src/main/java , while web resources (like html and ZK zul pages) will be in
+  src/main/webapp.
+  
+  The default relational db is an in-memory {{{http://hsqldb.org/}HsqlDb}}. The connection is defined inside
+  the META-INF/persistence.xml JPA config file (don't do it in production!). Feel free to change it to 
+  whatever you want. For example you can define a datasource in WEB-INF/web.xml and reference it from
+  persistence.xml
+  
+* Create the Application Object Model
+
+  Our Model is very simple. It consists of a single class only. We will call it "Person"
+  and it will have "firstName" and "lastName" properties.
+  The code will be something like this:
+  
++------------------------------------------------------+
+package it.amattioli.example1;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Version;
+
+import it.amattioli.dominate.Repository;
+import it.amattioli.dominate.RepositoryRegistry;
+import it.amattioli.dominate.jpa.JpaEntity;
+
+@Entity
+public class Person extends JpaEntity {
+    @Id @GeneratedValue 
+    private Long id;
+    @Version
+    private Long version;
+    private String firstName;
+    private String lastName;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public static Repository<Long, Person> repository() {
+        return RepositoryRegistry.instance().getRepository(Person.class);
+    }
+}
++------------------------------------------------------+  
+    
+  The Person class is an entity that extends the JpaEntity class so to inherit a set of convenience
+  methods. You can read the {{{../dominate/description.html}Dominate User Guide}} for details about entities.
+  
+  At the end we added a strange static method. It is needed to retrieve a repository for objects of this class.
+  
+  A repository is a sort of container for objects. As Person class objects will be persisted on a
+  relational database, every time you put an object in the repository it will be saved on the database,
+  and every time you retrieve an object from the repository it will be get from the database.
+  
+  For objects persisted with JPA, Hibernate classic and other relational databases, you don't need to develop a 
+  special repository class, Dominate already has one. All you have to do is to specify 
+  HibernateRepositoryFactory as your repository factory class. This can be done using 
+  setRepositoryFactoryClass() method of RepositoryRegistry class, but this has been already set for you
+  in a configuration file when you created the project from the Maven archetype.
+  
+  The presence of a repository() method in an entity class is not mandatory. You can always retrieve
+  a repository using the RepositoryRegistry singleton, but I've found that having such a method
+  help you writing more clean code.
+  
+  You can find more details about repositories in the {{{../dominate/description.html}DominATE User Guide}}
+  
+  The Person class will be persisted on the PERSON relational table. Having specified
+  
++-----------------------------------------------------+
+<property name="hibernate.hbm2ddl.auto" value="create" />
++-----------------------------------------------------+
+  
+  in the persistence.xml JPA config file this table will be created for you at runtime.
+  If you prefer to create your tables on your own feel free to remove this row from the file.
+  
+* Browsing through person objects
+
+  Our object model is ready, it's time to use it in a real application!
+  
+  All we need is a ZK zul page to show the Person list:
+  
++------------------------------------------------------+
+<window title="Persons" border="normal" 
+        width="100%" height="100%"
+        apply="it.amattioli.guidate.containers.BackBeanComposer">
+	
+    <custom-attributes backBean="PersonListBrowser"/>
+
+    <browserListbox hflex="1" vflex="1">
+        <listhead>
+            <listheader label="First Name" width="50%"/>
+            <listheader label="Last Name"  width="50%"/>
+        </listhead>
+        <listitemPrototype>
+        <labelListcell propertyName="firstName"/>
+            <labelListcell propertyName="lastName"/>
+        </listitemPrototype>
+    </browserListbox>
+
+</window>
++------------------------------------------------------+
+
+  Put it in personBrowser.zul under the webapp directory.
+  
+  If you run the application and point your browser to this page you can see something like this:
+  
+[images/basicExample/basicExample-1.png]
+
+  We have applied a "BackBeanComposer" class to our window. This means that the window will be the
+  view for a server side object. This object is specified using the "backBean" custom attribute.
+  
+  In our example the value of this attribute is "PersonListBrowser". This means that JavATE will create
+  a ListBrowser for the Person class. A ListBrowser is an object that give the user the possibility to 
+  browse through a list of Person objects. You can show it on your page using a ZK listbox or a grid,
+  for example. {{{../applicate/description.html}Applicate User Guide}} has details about ListBrowser
+  and other services.  
+   
+* Creating a new person
+
+  Now we want to expand our application giving the user the ability to create new persons.
+  
+  To create a new Person object we will make use of a Command, an object that encapsulate
+  an operation. In particular we will use a special case of Command, called an Editor.
+  An Editor is a Command that we can use when all we want to do is to take an object and
+  modify its properties.
+  
+  For a so common and so simple operation we don't need to develop a custom Command class,
+  we will use a default implementation. As for the ListBrowser all we need to do is reference
+  it in a zul page like this:
+  
++------------------------------------------+
+<window title="New Person" border="normal" 
+        width="30em"
+        contentStyle="padding: 0.3em"
+        apply="it.amattioli.guidate.containers.CommandComposer">
+		
+    <custom-attributes backBean="PersonEntityEditorCommand"/>
+
+    <hbox width="100%" align="center">
+        <cell width="40%">
+            <label value="First Name: "/>
+        </cell>
+        <cell width="60%">
+            <textProperty propertyName="firstName" width="99%"/>
+        </cell>
+    </hbox>
+
+    <hbox width="100%" align="center">
+        <cell width="40%">
+            <label value="Last Name: "/>
+        </cell>
+        <cell width="60%">
+            <textProperty propertyName="lastName" width="99%"/>
+        </cell>
+    </hbox>
+	
+    <hbox width="100%" pack="center" style="margin-top: 0.3em;">
+        <button label="Ok"     width="6em" forward="onClick=onOK"/>
+        <button label="Cancel" width="6em" forward="onClick=onCancel"/>
+    </hbox>
+
+</window>
++------------------------------------------+
+  
+  Put it in newPerson.zul under the webapp directory. If you run your application and point your browser
+  to this page you can see something like:
+  
+[images/basicExample/basicExample-2.png]
+
+  This time we applied to the window the "CommandComposer" class. This is similar to "BackBeanComposer"
+  we used previously but specialized for commands.
+  
+  The backBean attribute value is "PersonEntityEditorCommand", so JavATE will create an editor command
+  for the Person class.
+  
+  Inside this window we have two text boxes that represents the two properties of
+  a person that we want to edit, "Ok" and "Cancel" buttons.
+  
+  The text boxes are bound to the firstName and lastName properties of the object we are editing, so
+  every time we write something in the text box, it will be copied in the object property, and if the
+  object property changes the text box content will be updated.
+  
+  If the user press the Ok button (or the Enter key) the command will be executed.
+  
+  If the user press the Cancel button (or the Esc key) the command will be cancelled.
+  
+  In every case the window will be dismissed.  
+  
+  Obviously in a Rich Internet Application we don't want the user continuously switch 
+  between the two pages we created, so let's add a button in the browser page to call the 
+  command window. We can do it with a toolbar inside the browsing window so modify personBrowser.zul
+  in the following way:
+  
++--------------------------------------------+
+<window title="Persons" border="normal" 
+        width="100%" height="100%"
+        apply="it.amattioli.guidate.containers.BackBeanComposer">
+
+    <custom-attributes backBean="PersonListBrowser"/>
+
+    <toolbar>
+        <toolbarbutton label="New Person" apply="it.amattioli.guidate.btns.OpenWindowComposer">
+            <custom-attributes windowUri="newPerson.zul"/>
+        </toolbarbutton>
+    </toolbar>
+
+    <separator height="3px"/>
+
+    <browserListbox hflex="1" vflex="1">
+        <listhead>
+            <listheader label="First Name" width="50%"/>
+            <listheader label="Last Name"  width="50%"/>
+        </listhead>
+        <listitemPrototype>
+            <labelListcell propertyName="firstName"/>
+            <labelListcell propertyName="lastName"/>
+        </listitemPrototype>
+    </browserListbox>
+
+</window>
++--------------------------------------------+
+
+  We applied an OpenWindowComposer class to the ToolbarButton, in this way when you click on this
+  button the window contained in newPerson.zul will be opened.
+  
+[images/basicExample/basicExample-3.png]
+
+* Validation
+
+  Lots of frameworks put validation in the user interface layer but this is not an effective approach.
+  
+  Validation is clearly a business logic responsibility. If you have more than one interface to your
+  business logic you shouldn't have to replicate your validation code.
+  
+  With JavATE you can put validation code in your business logic in various ways, but the simplest one
+  is to use {{{http://www.hibernate.org/412.html}Hibernate Validator}}. For example, if you want to 
+  check that first name and last name are always entered, you can annotate the Person class properties 
+  like this:
+  
++-----------------------------------------------------+
+@NotEmpty
+public String getFirstName() {
+    return firstName;
+}
+
+@NotEmpty
+public String getLastName() {
+    return lastName;
+}
++-----------------------------------------------------+
+
+  Doing this causes the user interface to trigger validation of the fields when the user
+  leave the field and to show a message if it fails. 
+  To be sure that the user will not be able to execute the command if validation fails
+  just add the following composer to the command window:
+  
++-----------------------------------------------------+
+    <window title="New Person" border="normal" 
+        width="30em"
+        contentStyle="padding: 0.3em"
+        apply="it.amattioli.guidate.containers.CommandComposer,
+               it.amattioli.guidate.validators.ValidatingComposer">
++-----------------------------------------------------+
+  
+  The @Length Hibernate Validator annotation has a special role. If you use it like here
+  
++-----------------------------------------------------+
+@NotEmpty @Length(max=20)
+public String getFirstName() {
+    return firstName;
+}
++-----------------------------------------------------+
+  
+  the maxlength property of the textbox will be set, so the user will not be able to type
+  more characters than what you specified in the annotation.
+  
+* Add filtering to browsing window
+  
+  When the persons in your list become too much, you will want to filter them. You can do it using the
+  Specification pattern.
+  
+  Essentially a specification is an object that encapsulate a condition that can be verified on another
+  object. You can find a lot of details about specifications in the 
+  {{{../dominate/description.html}DominATE User Guide}}.  
+  
+  By default a list browser contains a specification that can be used to filter its content. The
+  default specification will have a property for every property of the underlying entity. Setting
+  a value in these properties will trigger a filter in the browser.
+  
+  To use the default specification of the person browser all we have to do is to bind two text boxes
+  to the firstName and lastName properties of the specification and add a button to trigger the filtering. 
+  So let us modify personBrowser.zul in the following way:
+  
++------------------------------------------------------+
+    .....
+        </toolbarbutton>
+    </toolbar>
+
+    <separator height="3px"/>
+
+    <hbox width="100%" 
+          pack="stretch" align="center"
+          apply="it.amattioli.guidate.containers.BackBeanComposer,
+                 it.amattioli.guidate.browsing.SpecificationComposer">
+
+        <custom-attributes backBean="parentBean.specification"/>
+
+        <cell width="90%">
+            <vbox width="100%" align="stretch">
+
+                <hbox width="100%" align="center" pack="stretch" >
+                    <cell width="20%">
+                        <label value="First Name"/>
+                    </cell>
+                    <cell width="30%">
+                        <textProperty propertyName="firstName"/>
+                    </cell>
+
+                    <cell width="20%">
+                        <label value="Last Name"/>
+                    </cell>
+                    <cell width="30%">
+                        <textProperty propertyName="lastName"/>
+                    </cell>
+                </hbox>
+
+            </vbox>
+        </cell>
+        <cell width="10%">
+            <button label="Search" apply="it.amattioli.guidate.browsing.SpecificationButtonComposer"/>
+        </cell>
+    </hbox>
+
+    <separator height="3px"/>
+
+    <browserListbox hflex="1" vflex="1">
+    .....
++------------------------------------------------------+   
+
+  We applied BackBeanComposer to the outer hbox but this time the backBean attribute value is
+  "parentBean.specification".
+  
+  This means that JavATE has to get the first container of the hbox that has a back bean, get its
+  back bean and get the "specification" property of this back bean.
+  
+  In our case the hbox is contained in a window whose back bean is the List Browser so the back bean 
+  of the hbox will be the specification of this List Browser.
+  
+  Inside this hbox there are two text properties bound to the firstName and lastName properties of
+  the specification.
+  
+  The SpecificationComposer is here to intercept events that will trigger the filtering of the list
+  browser, i.e. when the user press the Enter key or click the button which has SpecificationButtonComposer
+  applied.  
+  
+[images/basicExample/basicExample-4.png]
+
+* Add birthday property
+
+  Let's add some property more complex than a String! The first obvious non-string property
+  for a person is the birth date.
+  
+  We have to put it in the Person class:
+  
++------------------------------------------------------+
+    .........
+
+    private Date birthDate;
+    
+    @Past
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
+    
+    ........
++------------------------------------------------------+
+
+  It is very straightforward to add it to the browser listbox:
+  
++------------------------------------------------------+
+    <browserListbox hflex="1" vflex="1">
+        <listhead>
+            <listheader label="First Name" width="40%"/>
+            <listheader label="Last Name"  width="40%"/>
+            <listheader label="Birth Date" width="20%"/>
+        </listhead>
+        <listitemPrototype>
+            <labelListcell propertyName="firstName"/>
+            <labelListcell propertyName="lastName"/>
+            <labelListcell propertyName="birthDate" conversionFormat="dd/MM/yyyy"/>
+        </listitemPrototype>
+    </browserListbox>
++------------------------------------------------------+
+
+  If you don't specify a conversion format the default is the MEDIUM one for the user locale.
+  
+  It is also very simple to modify the editor window:
+  
++------------------------------------------------------+
+    <hbox width="100%" align="center">
+        <cell width="40%">
+            <label value="Birth Date: "/>
+        </cell>
+        <cell width="60%">
+            <dateProperty propertyName="birthDate" format="dd/MM/yyyy"/>
+        </cell>
+    </hbox>
++------------------------------------------------------+
+  
+  Notice that, as we annotated the birth date property with @Past, we will get an
+  error if we try to insert a future date.
+  
+  Adding a birth date filter to the browser is interesting. You can filter Date properties
+  using a range of dates.
+  
+  So change the specification box in personBrowser.zul in this way:
+  
++------------------------------------------------------+
+    <hbox width="100%" 
+          pack="stretch" align="center"
+          apply="it.amattioli.guidate.containers.BackBeanComposer,
+                 it.amattioli.guidate.browsing.SpecificationComposer">
+        <custom-attributes backBean="parentBean.specification"/>
+
+        <cell width="90%">
+            <vbox width="100%" align="stretch">
+
+                <hbox width="100%" align="center" pack="stretch" >
+                    <cell width="20%">
+                        <label value="First Name"/>
+                    </cell>
+                    <cell width="30%">
+                        <textProperty propertyName="firstName"/>
+                    </cell>
+
+                    <cell width="20%">
+                        <label value="Last Name"/>
+                    </cell>
+                    <cell width="30%">
+                        <textProperty propertyName="lastName"/>
+                    </cell>
+                </hbox>
+
+                <hbox width="100%" align="center" pack="stretch" >
+                    <cell width="20%">
+                        <label value="Birth Date"/>
+                    </cell>
+                    <cell width="30%">
+                        <timeIntervalProperty propertyName="birthDate"/>
+                    </cell>
+
+                    <space/>
+                </hbox>
+
+            </vbox>
+        </cell>
+        <cell width="10%">
+            <button label="Search" apply="it.amattioli.guidate.browsing.SpecificationButtonComposer"/>
+        </cell>
+    </hbox>
++------------------------------------------------------+
+
+  In the new timeIntervalProperty box you can enter:
+  
+  * A year
+  
+  * A month
+  
+  * A day
+  
+  * A couple of two of these separated by "-" or "..."
+  
+  []
+  
+  Unfortunately it is not i18n compliant yet, it supports "dd/MM/yyyy" format only.
+  So you can enter, for example: 
+  
+  * 05/1970 (from May 1, 1970 to May 31, 1970)
+  
+  * 19/01/1965-20/09/1975 (from January 19, 1965 to September 20, 1975)
+  
+  * 1950...2000 (from January 1, 1950 to December 31, 2000)
+  
+  []
+  
+  You can enter open intervals too. So
+  
+  * 1950...
+  
+  []
+  
+  means all the people born after January 1st 1950.
+  
+  Shortcuts are available like:
+  
+  * "today" and "yesterday"
+  
+  * the name of a month like "May" means all this month in the current year
+  
+  * the name of a day like "monday" means monday in the current week
+  
+  []
+  
+  The real work is done by the TimeIntervalFormat class, if you need you can use it
+  yourself to format/parse a TimeInterval. Refer to Encapsulate javadoc documentation
+  for more informations. 
+  
+  The birth date can be useful to show how to add a derived property. We can add a getAge()
+  method to our Person class:
+  
++---------------------------------------------------------+
+public void setBirthDate(Date birthDate) {
+    this.birthDate = birthDate;
+    this.firePropertyChange("age",null,getAge());
+}
+
+public Integer getAge() {
+    if (getBirthDate() == null) {
+        return null;
+    }
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(new Date());
+    int thisYear = cal.get(Calendar.YEAR);
+    cal.setTime(getBirthDate());
+    int birthYear = cal.get(Calendar.YEAR);
+    return thisYear - birthYear;
+}
++---------------------------------------------------------+
+  
+  We modified the setBirthDate() method too. In this way, every time the birtDate change,
+  we broadcast an event that informs that the age is changed. If we add to newPerson.zul
+  a readonly textbox bound to the age property this will be refreshed every time the user
+  enter a new value in the birthdate box.
+  
+  This is effective in simple cases like this where we have only one derived property. But when
+  a property modification triggers a lot of other derived property or a single derived property
+  depends on a lot of other property, firing the derived property change event when the
+  deriving property change could become a nightmare.
+  
+  In more complex cases we can use the @Derived annotation:
+  
++---------------------------------------------------------+
+public void setBirthDate(Date birthDate) {
+    Date old = this.birthDate;
+    this.birthDate = birthDate;
+    this.firePropertyChange("birthDate", old, birthDate);
+}
+
+@Derived(dependsOn="birthDate")
+public Integer getAge() {
+    if (getBirthDate() == null) {
++---------------------------------------------------------+ 
+  
+  Here we fired only its own property change in the setBirthDate method.
+  Having annotated the age accessor with @Derived(dependsOn="birthDate"), every
+  time a birthDate property change event is fired, an age property change
+  event is fired too.
+  
+  Properties can depends on more than one property with a syntax like this:
+  
++---------------------------------------------------------+
+@Derived(dependsOn={"property1","property2","property3"})
++---------------------------------------------------------+
+  
+  and cascading dependencies is supported, so propertyC can depends on propertyB
+  that depends on propertyA.
+  
+  In newPerson.zul we can add
+  
++---------------------------------------------------------+
+    <hbox width="100%" align="center">
+        <cell width="40%">
+            <label value="Age: "/>
+        </cell>
+        <cell width="60%">
+            <intProperty propertyName="age" readonly="true"/>
+        </cell>
+    </hbox>
++---------------------------------------------------------+ 
+  
+  to obtain
+  
+[images/basicExample/basicExample-5.png]  
+
+* Add gender property
+  
+  A person gender can be easily modeled using an enum:
+  
++----------------------------------------------------+
+package it.amattioli.example1;
+
+public enum Gender {
+	MALE,
+	FEMALE;
+}
++----------------------------------------------------+ 
+
+  Simply add a property of type Gender to your Person class and JPA will persist it for you.
+  
+  Adding a cell to the listbrowser box is as simple as the date cell:
+  
++----------------------------------------------------+
+    
+    <labelListcell propertyName="gender"/>
+		
++----------------------------------------------------+
+
+  EnumConverter, the default converter for enumerations, having no other hint on how 
+  to convert the enum objects to strings, will use the enum objects names, 
+  but we can do better.
+  
+  The simplest thing to do is to use the ZK i3-label.properties 
+  Create an i3-label.properties file under WEB-INF and add two rows like
+  the following:
+  
++----------------------------------------------------+
+  it.amattioli.example1.Gender.MALE = Male
+  it.amattioli.example1.Gender.FEMALE = Female
++----------------------------------------------------+ 
+  
+  But this limits the full reuse of your Gender class. If you want to use it in another
+  application you have to reproduce this rows in its i3-label.properties file (or something
+  else if it's not a ZK application).
+  
+  If you think this can be an issue you can use another approach.
+  
+  Let the Gender class implement the Described interface:
+  
++----------------------------------------------------+
+package it.amattioli.example1;
+
+import java.util.ResourceBundle;
+
+import it.amattioli.dominate.Described;
+
+public enum Gender implements Described {
+    MALE,
+    FEMALE;
+
+    private static final ResourceBundle DESCRIPTIONS = ResourceBundle.getBundle("it.amattioli.example1.GenderDescriptions");
+
+    @Override
+    public String getDescription() {
+        return DESCRIPTIONS.getString(this.name());
+    }
+}
++----------------------------------------------------+
+
+  and add a GenderDescriptions.properties file containing
+  
++----------------------------------------------------+
+MALE = Male
+FEMALE = Female
++----------------------------------------------------+
+  
+  The EnumConverter will recognize that Gender implements ths Described property and
+  will use its getDescription() method to convert the object to a String.
+  
+  Now, if you want, you can put the Gender class and its property file in a jar and
+  reuse it in every JavATE appplication.
+  
+  To let the user choose the person gender, in the personEditor.zul we can add
+  
++----------------------------------------------------+
+    <hbox width="100%" align="center">
+        <cell width="40%">
+             <label value="Gender: "/>
+        </cell>
+        <cell width="60%">
+             <listProperty propertyName="gender" mold="select"/>
+        </cell>
+    </hbox>
++----------------------------------------------------+  
+
+  The listbox wil be ppopulated with the enum objects using EnumConverter to get 
+  their labels. The initially selected item will be obtained from the entity and 
+  each time the user select a different item the entity will be updated.
+  
+  Notice that the first item in the listbox is an empty one. This is because the
+  gender property is nullable so the user is able to choose a null value for it.
+  If we annotate the gender property with @NotNull the empty item will disappear
+  but we have to initialize the property with a not-null value too, otherwise
+  the listbox will not be able to correctly initialize itself.
+  
+  And what about filtering? Add the appropriate listProperty to personBrowser.zul
+  
++----------------------------------------------------+
+<hbox width="100%" align="center" pack="stretch" >
+    <cell width="20%">
+        <label value="Birth Date"/>
+    </cell>
+    <cell width="30%">
+        <timeIntervalProperty propertyName="birthDate"/>
+    </cell>
+
+    <cell width="20%">
+        <label value="Gender"/>
+    </cell>
+    <cell width="30%">
+        <listProperty propertyName="gender" mold="select"/>
+    </cell>
+</hbox>
++----------------------------------------------------+
+  
+* Add birth town property
+
+  To show how to use entity association we will add a birth town property to the person class.
+  
+  The first thing we do is creating a Town entity like the following:
+  
++----------------------------------------------------+
+@Entity
+public class Town extends JpaEntity {
+    @Id @GeneratedValue 
+    private Long id;
+    @Version
+    private Long version;
+    private String name;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+}
++----------------------------------------------------+
+
+  At startup the database table corresponding to this entity will be empty so we need
+  an editor for towns.
+  
+  The ZUL file for this editor can be like:
+  
++----------------------------------------------------+
+<window title="Towns" border="normal" 
+        width="30em"
+        contentStyle="padding: 0.3em"
+        apply="it.amattioli.guidate.containers.CommandComposer,
+               it.amattioli.guidate.validators.ValidatingComposer">
+
+    <custom-attributes backBean="TownRepositoryEditor"/>
+
+    <panel>
+
+        <toolbar>
+            <toolbarbutton label="Add" width="70px" 
+                           apply="it.amattioli.guidate.editing.AddRowComposer"/>
+            <toolbarbutton label="Remove" width="70px" 
+                           apply="it.amattioli.guidate.editing.DeleteRowComposer"/>
+        </toolbar>
+
+        <panelchildren>
+            <editorListbox rows="10" apply="it.amattioli.guidate.editing.ChangeListitemComposer">
+                <listhead>
+                    <listheader label="Name"/>
+                </listhead>
+                <listitemPrototype>
+                    <listcell>
+                        <textProperty propertyName="name" width="99%"/>
+                    </listcell>
+                </listitemPrototype>
+            </editorListbox>
+        </panelchildren>
+
+        <toolbar mold="panel" align="center">
+            <button label="Ok"     width="6em" forward="onClick=onOK"/>
+            <button label="Cancel" width="6em" forward="onClick=onCancel"/>
+        </toolbar>
+
+    </panel>
+	
+</window>
++----------------------------------------------------+
+
+  The back bean of the window is "TownRepositoryEditor". When the name of the back bean end with 
+  "RepositoryEditor" JavATE will build a command that allows you to edit the content of a repository,
+  in our case we want to edit the Town repository.
+  
+  Inside the window there is an editorListbox. It works like browserListbox but:
+  
+  * You can edit the objects displayed
+  
+  * You cannot filter the content
+  
+  []
+  
+  To the editorListbox is applyed ChangeListitemComposer so you can scroll the rows using the keyboard.
+  
+  Just above the editorLitsbox there is a toolbar containing two buttons, one for adding a new row, one
+  for removing the currently selected row. 
+  
+[images/basicExample/basicExample-6.png]
+
+  Now we can add a Town property to the person:
+  
++----------------------------------------------------+
+    @ManyToOne
+    private Town birthTown;
+    
+    public Town getBirthTown() {
+        return birthTown;
+	}
+
+    public void setBirthTown(Town birthTown) {
+        this.birthTown = birthTown;
+    }
++----------------------------------------------------+
+
+  and add a corresponding column in the browserListbox in personBrowser.zul:
+  
++----------------------------------------------------+
+    <labelListcell propertyName="birthTown.name"/>
++----------------------------------------------------+
+
+  where we used the dotted notation to specify that we want to display the name property of the
+  Town object obtained through the birthTown property of a person.
+  
+  If a class has a property that describe it and can be used to show it, like the name of a town,
+  we have an alternative to the continuous use of the dotted notation. We can implement the
+  Described interface.
+  
+  For the Town class it will be saomething like:
+  
++----------------------------------------------------+
+
+public class Town extends JpaEntity implements Described {
+
+...
+
+    public String getDescription() {
+        return getName();
+    }
+    
+...
+
+}
++----------------------------------------------------+
+
+  Now we can avoid the dotted notation
+  
++----------------------------------------------------+
+    <labelListcell propertyName="birthTown"/>
++----------------------------------------------------+
+
+  as everytime JavATE will need to display an object of class Town it will use
+  its getDescription() method to retrieve the String to be displayed.
+  
+  To add the possibility to select the birthTown while creating a new person simply add
+  the following to newPerson.zul
+  
++----------------------------------------------------+
+    <hbox width="100%" align="center">
+        <cell width="40%">
+            <label value="Birth Town: "/>
+        </cell>
+        <cell width="60%">
+             <listProperty propertyName="birthTown" mold="select"/>
+        </cell>
+    </hbox>
++----------------------------------------------------+
+
+  and for searching add this to personBrowser.zul
+  
++----------------------------------------------------+
+<hbox width="100%" align="center" pack="stretch" >
+    <cell width="20%">
+        <label value="Birth Town"/>
+    </cell>
+    <cell width="30%">
+        <listProperty propertyName="birthTown" mold="select"/>
+    </cell>
+
+    <space/>
+</hbox>
++----------------------------------------------------+

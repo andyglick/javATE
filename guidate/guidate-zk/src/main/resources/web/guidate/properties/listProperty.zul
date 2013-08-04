@@ -1,0 +1,33 @@
+<listbox apply="it.amattioli.guidate.properties.PropertyValuesComposer ,${arg.alsoApply}">
+	<custom-attributes propertyName="${arg.propertyName}"/>
+	<custom-attributes typeConverter="${arg.typeConverter}"/>
+	<!-- Listbox properties -->
+	<attribute if="${arg.checkmark != null}" name="checkmark">${arg.checkmark}</attribute>
+	<attribute if="${arg.disabled != null}" name="disabled">${arg.disabled}</attribute>
+	<attribute if="${arg.fixedLayout != null}" name="fixedLayout">${arg.fixedLayout}</attribute>
+	<attribute if="${arg.maxLength != null}" name="maxLength">${arg.maxLength}</attribute>
+	<attribute if="${arg.mold != null}" name="mold">${arg.mold}</attribute>
+	<attribute if="${arg.oddRowSclass != null}" name="oddRowSclass">${arg.oddRowSclass}</attribute>
+	<attribute if="${arg.preloadSize != null}" name="preloadSize">${arg.preloadSize}</attribute>
+	<attribute if="${arg.rows != null}" name="rows">${arg.rows}</attribute>
+	<attribute if="${arg.tabindex != null}" name="tabindex">${arg.tabindex}</attribute>
+	<attribute if="${arg.vflex != null}" name="vflex">${arg.vflex}</attribute>
+	<!--  XulElement properties -->
+	<attribute if="${arg.context != null}" name="context">${arg.context}</attribute>
+	<attribute if="${arg.popup != null}" name="popup">${arg.popup}</attribute>
+	<attribute if="${arg.tooltip != null}" name="tooltip">${arg.tooltip}</attribute>
+	<!--  HtmlBasedComponent properties -->
+	<attribute if="${arg.draggable != null}" name="draggable">${arg.draggable}</attribute>
+	<attribute if="${arg.droppable != null}" name="droppable">${arg.droppable}</attribute>
+	<attribute if="${arg.height != null}" name="height">${arg.height}</attribute>
+	<attribute if="${arg.left != null}" name="left">${arg.left}</attribute>
+	<attribute if="${arg.sclass != null}" name="sclass">${arg.sclass}</attribute>
+	<attribute if="${arg.style != null}" name="style">${arg.style}</attribute>
+	<attribute if="${arg.tooltiptext != null}" name="tooltiptext">${arg.tooltiptext}</attribute>
+	<attribute if="${arg.top != null}" name="top">${arg.top}</attribute>
+	<attribute if="${arg.width != null}" name="width">${arg.width}</attribute>
+	<attribute if="${arg.zclass != null}" name="zclass">${arg.zclass}</attribute>
+	<!-- Component properties -->
+	<attribute if="${arg.id != null}" name="id">${arg.id}</attribute>
+	<attribute if="${arg.mold != null}" name="mold">${arg.mold}</attribute>
+</listbox>

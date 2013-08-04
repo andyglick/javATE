@@ -1,0 +1,150 @@
+Using JavATE with MongoDB
+
+* Introduction
+ 
+ Since project startup, {{{http://www.javate.amattioli.it}JavATE}} has been supporting out of the box 
+ two types of repositories for storing entities:
+ 
+ * Memory repositories
+ 
+ * Relational Databases
+ 
+ []
+ 
+ The former, used mainly for testing purposes, are based on simple java Maps.
+ 
+ The support for relational databases is based essentially on {{{http://www.hibernate.org}Hibernate}} ORM.
+ 
+ JavATE is highly extensible and users can write their own repositories (an example {{{repositories.html}here}}).
+ 
+ Since interest in NoSQL databases is constantly growing the JavATE dev team decided to add support
+ for some of them, so, starting from version 0.8, you can find a new JavATE module called dominate-morphia
+ that add support for {{{http://www.mongodb.org/}MongoDB}} using {{{http://code.google.com/p/morphia/}Morphia}}, 
+ a lightweight type-safe library for mapping Java objects to/from {{{http://www.mongodb.org/}MongoDB}}.    
+
+* Setup
+
+ If you are using Maven, or Ant with Ivy or another dependency manager that is able to access a Maven
+ repository setting up a project that use the new module is really simple.
+ 
+ Using Maven all you have to do is to put the following inside your dependencies in the project pom
+ 
++-------------------------------------------------+
+<dependency>
+    <groupId>it.amattioli</groupId>
+    <artifactId>dominate-morphia</artifactId>
+    <version>0.8</version>
+</dependency>
++-------------------------------------------------+
+
+ If you are managing dependencies by hand you can download dominate-morphia.jar from 
+ {{{http://sourceforge.net/projects/javate/files/}SourceForge}}
+ and then add all the dependecies listed 
+ {{{http://www.javate.amattioli.it/dominate-morphia/dependencies.html}here}}.
+ 
+ At your application startup you have to configure Morphia for accessing your MongoDB database.
+ 
+ You can do this with something like:
+ 
++-----------------------------------------------------+
+  Mongo m = new Mongo( "localhost" , 27017 );
+  MorphiaSessionManager.setMongo(mongo);
+  MorphiaSessionManager.setDatabase("myDatabase");
++-----------------------------------------------------+
+
+ Mongo is a class from the MongoDB Java driver. You can use it to describe how to connect to your
+ MongoDB database including user credentials.
+
+ If you don't inject the Mongo instance into MorphiaSessionManager it will try a connection
+ to a MongoDB database on localhost using the default port.
+
+* Creating a Morphia mapped entity
+
+ Morphia use Java annotations for mapping entities.
+ 
+ Suppose you need a Person entity with name, surname and birth date. You can do it with:
+ 
++-------------------------------------------------+
+@Entity("persons")
+public class Person implements Entity<ObjectId> {
+    @Id private ObjectId id;
+    private String name;
+    private String surname;
+    private Date birthDate;
+
+    public ObjectId getId() {
+        return id;
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
+    }    
+    
+    .... 
+}
++-------------------------------------------------+
+
+ Where property accessor methods have been omitted for brevity.
+ 
+ Entities will be saved in a MongoDB collection with the same name of the class unless
+ specified in the Entity annotation.
+ 
+ Morphia has a lot of annotations for mapping purposes. Look at the 
+ {{{http://code.google.com/p/morphia/}Morphia site}} for reference.
+ 
+ To save some lines of code you can even extend the MorphiaEntity class that implements 
+ equals() and hashcode() too:
+ 
++-------------------------------------------------+
+public class Person extends MorphiaEntity {
+    private String name;
+    private String surname;
+    private Date birthDate;
+    
+    .... 
+}
++-------------------------------------------------+
+
+ Once you have your entity classes you need to tell Morphia that its a mapped entity so,
+ in your application startup, after configuring db access do:
+ 
++-------------------------------------------------+
+  Morphia morphia = MorphiaSessionManager.getMorphia();
+  morphia.map(Person.class);
++-------------------------------------------------+
+ 
+* Getting and putting entities
+
+ Now the Morphia-specific code is finished and you can use standard JavATE APIs for putting
+ entities inside the repository and retrieve them. For example:
+ 
++-------------------------------------------------+
+MorphiaRepository<ObjectId, MyEntity> rep = new MorphiaRepository<ObjectId, MyEntity>(MyEntity.class);
+Person p = new Person();		
+p.setName("Andrea");
+p.setSurname("Mattioli");
+p.setBirthDate((new SimpleDateFormat("dd/MM/yyyy")).parse("04/04/1970"));
+rep.put(p);
++-------------------------------------------------+
+
+ MongoDB is not a transactional database so you don't need a commit statement. Entities are saved
+ in the database at the same time you call the put() method in the repository.
+
+* Querying with specifications
+
+ Querying can be done using the classical JavATE specification API. For example:
+ 
++-------------------------------------------------+
+StringSpecification<Person> spec = StringSpecification.newInstance("name");
+spec.setValue("Andrea");
+List<Person> result = rep.list(spec);
++-------------------------------------------------+
+
+ At this moment dominate-morphia has support for String and Object specifications.
+ Other kind of specifications (Enum, Entity, ecc.) will be added in future releases.
+ 
+ Composite specifications are also supported as they are independent of the underlying
+ query mechanism.
+ 
+ Due to a strange limitation of Morphia the NegatedSpecification class cannot be used
+ at this moment. 

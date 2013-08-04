@@ -1,0 +1,42 @@
+<bandbox apply="it.amattioli.guidate.browsing.EntitySelectorComposer">
+    <custom-attributes backBean="${arg.selector}"
+                       propertyName="${arg.propertyName}"/>
+    <!-- InputElement properties -->
+	<attribute if="${arg.cols != null}" name="cols">${arg.cols}</attribute>
+	<attribute if="${arg.constraint != null}" name="constraint">${arg.constraint}</attribute>
+	<attribute if="${arg.disabled != null}" name="disabled">${arg.disabled}</attribute>
+	<attribute if="${arg.maxlength != null}" name="maxlength">${arg.maxlength}</attribute>
+	<attribute if="${arg.readonly != null}" name="readonly">${arg.readonly}</attribute>
+	<attribute if="${arg.tabindex != null}" name="tabindex">${arg.tabindex}</attribute>
+	<!--  XulElement properties -->
+	<attribute if="${arg.context != null}" name="context">${arg.context}</attribute>
+	<attribute if="${arg.popup != null}" name="popup">${arg.popup}</attribute>
+	<attribute if="${arg.tooltip != null}" name="tooltip">${arg.tooltip}</attribute>
+	<!--  HtmlBasedComponent properties -->
+	<attribute if="${arg.draggable != null}" name="draggable">${arg.draggable}</attribute>
+	<attribute if="${arg.droppable != null}" name="droppable">${arg.droppable}</attribute>
+	<attribute if="${arg.height != null}" name="height">${arg.height}</attribute>
+	<attribute if="${arg.left != null}" name="left">${arg.left}</attribute>
+	<attribute if="${arg.sclass != null}" name="sclass">${arg.sclass}</attribute>
+	<attribute if="${arg.style != null}" name="style">${arg.style}</attribute>
+	<attribute if="${arg.tooltiptext != null}" name="tooltiptext">${arg.tooltiptext}</attribute>
+	<attribute if="${arg.top != null}" name="top">${arg.top}</attribute>
+	<attribute if="${arg.width != null}" name="width">${arg.width}</attribute>
+	<attribute if="${arg.zclass != null}" name="zclass">${arg.zclass}</attribute>
+	<!-- Component properties -->
+	<attribute if="${arg.id != null}" name="id">${arg.id}</attribute>
+	<attribute if="${arg.mold != null}" name="mold">${arg.mold}</attribute>
+	<!-- PopUp -->
+	<bandpopup fulfill="onOpenBandpopup">
+		<attribute if="${arg.popupWidth != null}" name="width">${arg.popupWidth}</attribute>
+		<attribute if="${arg.popupHeight != null}" name="height">${arg.popupHeight}</attribute>
+		<attribute if="${arg.popupSclass != null}" name="sclass">${arg.popupSclass}</attribute>
+		<attribute if="${arg.popupZclass != null}" name="zclass">${arg.popupZclass}</attribute>
+		<browserListbox width="99%">
+			<attribute if="${arg.popupRows != null}" name="rows">${arg.popupRows}</attribute>
+			<listitemPrototype>
+				<labelListcell propertyName="description"/>
+			</listitemPrototype>
+		</browserListbox>
+	</bandpopup>
+</bandbox>

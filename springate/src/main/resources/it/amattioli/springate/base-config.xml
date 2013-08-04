@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="repositoryRegistry"
+	      class="it.amattioli.dominate.RepositoryRegistry"
+	      factory-method="instance"/>
+
+	<bean id="repository" 
+	      abstract="true"
+	      scope="prototype"
+	      factory-bean="repositoryRegistry"
+	      factory-method="getRepository"/>
+	
+	<bean id="threadLocalContext" 
+	      abstract="true"
+	      class="it.amattioli.applicate.context.ThreadLocalContext"
+	      factory-method="newThreadLocalService"/>
+	      
+	<bean id="longRunningContext" 
+	      abstract="true"
+	      class="it.amattioli.applicate.context.LongRunningContext"
+	      factory-method="newLongRunningService"/>
+
+	<bean id="transactionalContext" 
+	      abstract="true"
+	      class="it.amattioli.applicate.context.TransactionalCommandContext"
+	      factory-method="newTransaction"/>
+	
+</beans>

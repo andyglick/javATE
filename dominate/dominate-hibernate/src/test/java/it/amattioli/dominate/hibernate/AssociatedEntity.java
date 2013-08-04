@@ -1,0 +1,15 @@
+package it.amattioli.dominate.hibernate;
+
+import it.amattioli.dominate.EntityImpl;
+
+public class AssociatedEntity extends EntityImpl {
+	private String assocDescription;
+
+	public String getAssocDescription() {
+		return assocDescription;
+	}
+
+	public void setAssocDescription(String assocDescription) {
+		this.assocDescription = assocDescription;
+	}
+}

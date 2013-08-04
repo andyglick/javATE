@@ -1,0 +1,12 @@
+<!ELEMENT eventi (evento*) >
+
+<!ELEMENT evento (attributo*,array*) >
+  <!ATTLIST evento name CDATA #REQUIRED>
+
+<!ELEMENT attributo EMPTY >
+  <!ATTLIST attributo name CDATA #REQUIRED>
+  
+<!ELEMENT array (elemento*) >
+  <!ATTLIST array name CDATA #REQUIRED>
+  
+<!ELEMENT elemento EMPTY >

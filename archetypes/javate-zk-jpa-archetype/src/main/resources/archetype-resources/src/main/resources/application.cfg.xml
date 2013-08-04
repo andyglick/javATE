@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+    
+    <bean id="repositoryRegistry" class="it.amattioli.dominate.RepositoryRegistry">
+        <property name="repositoryFactoryClass" 
+                  value="it.amattioli.dominate.jpa.JpaRepositoryFactory"/>
+    </bean>
+	
+	<bean id="applicateSession" class="it.amattioli.applicate.sessions.ApplicateSession" scope="prototype">
+        <property name="serviceFactory" ref="serviceFactory"/>
+    </bean>
+	
+	<bean id="serviceFactory" class="it.amattioli.applicate.serviceFactory.CompositeServiceFactory">
+		<property name="factories">
+			<list>
+				<ref bean="springServiceFactory"/>
+				<ref bean="defaultServiceFactory"/>
+			</list>
+		</property>
+    </bean>
+    
+    <bean id="springServiceFactory" class="it.amattioli.springate.SpringServiceFactory">
+    	<constructor-arg value="classpath*:/service-config.xml"/>
+    </bean>
+    
+    <bean id="defaultServiceFactory" class="it.amattioli.applicate.serviceFactory.CompositeServiceFactory">
+		<property name="factories">
+			<list>
+				<bean class="it.amattioli.applicate.context.LongRunningServiceFactoryDecorator">
+			    	<constructor-arg>
+			    		<bean class="it.amattioli.applicate.serviceFactory.CompositeServiceFactory">
+							<property name="factories">
+								<list>
+			    					<bean class="it.amattioli.applicate.serviceFactory.ListBrowserFactory"/>
+						    		<bean class="it.amattioli.applicate.serviceFactory.ObjectBrowserFactory"/>
+						    		<bean class="it.amattioli.applicate.serviceFactory.TreeBrowserFactory"/>
+						    		<bean class="it.amattioli.applicate.serviceFactory.EntitySelectorFactory"/>
+						    	</list>
+						    </property>
+						</bean>
+			    	</constructor-arg>
+			    </bean>
+			    <bean class="it.amattioli.applicate.context.TransactionalServiceFactoryDecorator">
+			    	<constructor-arg>
+			    		<bean class="it.amattioli.applicate.serviceFactory.CompositeServiceFactory">
+							<property name="factories">
+								<list>
+			    					<bean class="it.amattioli.applicate.serviceFactory.EntityEditorCommandFactory"/>
+			    					<bean class="it.amattioli.applicate.serviceFactory.RepositoryEditorFactory"/>
+			    					<bean class="it.amattioli.applicate.serviceFactory.TreeEditorCommandFactory"/>
+						    	</list>
+						    </property>
+						</bean>
+			    	</constructor-arg>
+			    </bean>
+			</list>
+		</property>
+    </bean>
+	  
+</beans>

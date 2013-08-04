@@ -1,0 +1,829 @@
+User Guide
+
+ Once you have an object model you need to interact with it, and the most common way
+ of interacting with an application is:
+
+  * Browse through the network of the objects that compose your model
+
+  * Once you have reached the object you are interested in, send commands to it
+  
+ This interaction can be mediated using services, and we can identify two distinct 
+ set of services: Browsers and Commands.
+ 
+ JavATE ApplicATE offers both interfaces and default implementations for this
+ services.
+
+* Browsers
+
+ Browsers let you navigate through the web of your object model.
+ 
+ The simplest way of doing this is using a list. You can scroll the list, filter 
+ its content and select one (or more) element. So we have ListBrowsers.
+ 
+ But there are other ways. If your objects are naturally organized in a hierarchy,
+ you can browse them using a TreeBrowser. If your objects have a master date you
+ can use a CalendarBrowser. And you can invent others.
+ 
+ Pay attention to not confuse the browser (the service) with the user interface.
+ There can be different views for the same way of browsing your objects. A ListBrowser
+ can be viewed as a table where each row represents an object and each column is
+ an object attribute, but we can view it as a grid with an icon representing a single
+ object in each cell.
+ 
+** ListBrowser
+ 
+ Most of the time you will interact with your object model using a ListBrowser.
+ 
+ ListBrowser is an interface that has methods that allow you to:
+ 
+ * Retrieve the list of objects you are browsing
+ 
+ * Filter and order this list
+ 
+ * Select an object
+ 
+ * Scroll this selection
+ 
+ The default implementation of this interface is ListBrowserImpl. This class accept
+ a repository as the source of the objects to be browsed. So, given:
+ 
++--------------------------------------------------+
+ListBrowser brw = new ListBrowserImpl(new MyObjectRepository());
++--------------------------------------------------+
+ 
+ you can retrieve all the objects in the repository with
+ 
++--------------------------------------------------+
+brw.getList();
++--------------------------------------------------+
+ 
+ If you are interested in a subset of the repository only, you can filter
+ the objects using a Specification, so after:
+ 
++--------------------------------------------------+
+MyObjectSpecification spec = new MyObjectSpecification();
+brw.setSpecification(spec);
++--------------------------------------------------+
+ 
+ a call to getList() will retrieve only the objects that satisfy the specification.
+ 
+ ListBrowserImpl will listen to PropertyChange events sent by the filter and react so
+ to change its content properly. If we do 
+ 
++--------------------------------------------------+
+f.setMyProperty(value);
++--------------------------------------------------+
+ 
+ a successive call to getList() will probably retrieve a different subset.
+
+ To order the objects we can use the two overloaded setObject() methods. One version
+ takes two parameters: the name of the property on which you want to perform the
+ ordering and a boolean that indicate if you want ascending or descending order.
+ 
+ The second version takes only the property name. If you call it two times with the
+ same property name the order will be inverted.
+ 
+ To know if the content of the browser has changed, independently of the way it happened
+ (setting a filter or one of the setOrder methods, etc.) you can listen to the
+ PropertyChanged events of the "list" property in a way like this:
+ 
++----------------------------------------------------+
+brw.addPropertyChangeListener(new PropertyChangeListener() {
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if ("list".equals(evt.getPropertyName())) {
+            List<?> newContent = browser.getList();
+            // ... do something with the retrieved content
+        }
+    }
+    
+});
++----------------------------------------------------+  
+ 
+** Selection
+
+  Selection plays an important role in ApplicATE. A lot of services give the possibility to select an
+  object in some way. Other services can be notified of this selection and can, consequently, retrieve
+  the selected object.
+  
+  All this is expressed by the Selector interface. This interface has methods for:
+  
+  * adding and removing listeners of the selection
+  
+  * retrieving the selected object
+
+  Given a service that implements the Selector interface you can do:
+  
++--------------------------------------------+
+SelectionListener listener = new SelectionListener() {
+
+    public void objectSelected(SelectionEvent event) {
+        Object selected = event.getSource().getSelectedObject();
+        // ... use the selected object as you need
+    }
+
+}
+
+myService.addSelectionListener(listener);
++--------------------------------------------+
+
+*** Selection in ListBrowser
+
+  The most common way for object selection in a ListBrowser is using one of the overloaded versions
+  of the select() method.
+  
+  If you have the index of the object you want to select call:
+  
++----------------------------+
+myListBrowser.select(index);
++----------------------------+
+
+  The index is relative to the list you can retrieve using the getList() method.
+  
+  If you have the entire object you want to select call:
+  
++-------------------------------+
+myListBrowser.select(myObject);
++-------------------------------+
+
+  Once you have an object selected you can move the selection using the next() and previous() methods.
+
+*** EntitySelector 
+ 
+** ObjectBrowser 
+ 
+ An object browser is a wrapper around an object of the model that allows to browse
+ its attributes.
+ 
+ At first an object browser could seem useless. You get an object from the model and
+ you can retrieve its attributes using its methods. Why we need a wrapper?
+ 
+ The answer is that the object browser has features that a plain model object can't have:
+ 
+ * It can listen to command events and automatically refresh its content from the repository
+ 
+ * It can listen to another browser selection and change the object it is browsing
+ 
+ * You can retrieve browsers for associated objects
+ 
+ Let's start from the first one. Every time a command is done there's the possibility
+ that an object changed its internal state. If you have a view on an object there are
+ two possibilities:
+ 
+ * The view and the command share the same object so each update are reflected on the view
+ 
+ * The command save a copy of the object in the repository and send an event, so the
+   listeners can retrieve the new copy from the repository.
+   
+ ApplicATE use this second approach, and the object browser act as the listener of the
+ event: every time an object browser receive an event from a command signaling that
+ something happened, it retrieves a fresh copy of its content from the repository and
+ fires a PropertyChangeEvent event. The name of the property in the fired event is
+ "hold" because through this property you can retrieve the full object you are browsing on.
+ The "view" object, finally, can listen to this event to update the screen.    
+ 
+** TreeBrowser
+ 
+ If your objects are organized in a tree-like structure (as in the Composite pattern) you
+ can use a TreeBrowser to navigate among them.
+ 
+ You will typically pass the root of the tree to the browser, the you will be able to retrieve
+ direct children using the getChildrenOf() method while a generic node can be retrieved using
+ the getTargetOf() method. The latter takes a TreePath object as a parameter and return the
+ node targeted by this path.
+ 
+ Let see some examples using the DefaultTreeBrowser implementation of the TreeBrowser interface.
+ 
+ Suppose you have a set of entities organized in tree-structure like the following:
+ 
++---------------------------------------------------------------+
+public class MyNode extends EntityImpl {
+    private MyNode parent;
+    private List<MyNode> children;
+  
+    ........
+  
+    public MyNode getParent() {
+        return parent;
+    }
+  
+    ........
+  
+    public List<MyNode> getChildren() {
+        return children;
+    }
+  
+}
++---------------------------------------------------------------+  
+ 
+ When we instantiate the DefaultTreeBrowser we need to give it a repository to access the entities,
+ the id of the root entity, and the name of the properties used to access the parent and the children
+ of each node:
+ 
++---------------------------------------------------------------+
+  TreeBrowser<Long,MyNode> brw = new DefaultTreeBrowser<Long,MyNode>(
+                                     RepositoryRegistry.instance().getRepository(MyNode.class),
+                                     1L,
+                                     "children",
+                                     "parent"
+                                 );
++---------------------------------------------------------------+  
+ 
+ Now we can retrieve all the children of the root with:
+ 
++---------------------------------------------------------------+
+  MyNode root = brw.getRoot();
+  List<MyNode> rootChildren = brw.getChildrenOf(root);
++---------------------------------------------------------------+
+ 
+ Using getPathOf() we can retrieve the path of the root entity and the use it to navigate down the tree.
+ In the following example we will retrieve the path of the second child of the third child of the root and
+ the use this path to retrieve this element.
+ 
++---------------------------------------------------------------+
+  TreePath path = brw.getPathOf(root);
+  path = path.childrenPath(2).childrenPath(1);
+  MyNode target = brw.getTargetOf(path);
++---------------------------------------------------------------+
+ 
+ You can select a node using both the path or the node itself
+ 
++---------------------------------------------------------------+
+  brw.select(path);
+  // the same as
+  brw.select(target);
++---------------------------------------------------------------+
+ 
+ and then you can retrieve the selected node or the selected path
+ 
++---------------------------------------------------------------+
+  MyNode selectedNode = brw.getSelectedObject();
+  TreePath selectedPath = brw.getSelectedPath();
++---------------------------------------------------------------+
+ 
+** CalendarBrowser
+
+* Commands
+
+ A command is a way to encapsulate an operation in an object. You can create a command
+ object, set the operation parameters passing them to the constructor or using properties
+ accessor methods, and then execute the operation calling a particular method on the
+ command object.
+ 
+ This approach has various advantages:
+ 
+ * You can record the list of executed commands so as to undo them subsequently
+ 
+ * You can create create complex operations composing commands as needed at runtime
+ 
+ * You can decorate the command so as to add features to it
+ 
+ In JavATE a command is an instance of the Command interface. This interface has a
+ doCommand() method that is used to execute the command and a cancelCommand() method
+ that is used to cancel its execution.
+ 
+ For example, imagine you need a command that call a simple method on an Entity. This
+ is the base code for doing it:
+ 
++-------------------------------------------------------------------------+
+public class MyMethodCommand implements Command {
+  private Long targetId;
+  
+  public void setTargetId(Long id) {
+    this.targetId = id;
+  }
+  
+  public Long getTargetId() {
+    return targetId;
+  }
+  
+  public void doCommand() {
+    MyEntity target = MyEntity.repository().get(targetId);
+    target.myMethod();
+  }
+  
+  public void cancelCommand() {
+  }
+
+  ...............
+
+}
++-------------------------------------------------------------------------+
+ 
+ Usually the cancelCommand method is empty but you can override it to perform some
+ cleanup code.
+ 
+ The other two methods of the Command interface deal with the command events. Every
+ time a command is executed a CommandEvent is fired and you can listen to these events
+ adding a CommandListener implementation to the command using one of the two
+ addCommandListener methods.
+ 
+ So the complete code for our command now is:
+ 
++--------------------------------------------------------------------------+
+public class MyMethodCommand implements Command {
+  private CommandEventSupport cmdEvtSupport = new CommandEventSupport();
+  private Long targetId;
+  
+  public void setTargetId(Long id) {
+    this.targetId = id;
+  }
+  
+  public Long getTargetId() {
+    return targetId;
+  }
+  
+  public void doCommand() {
+    MyEntity target = MyEntity.repository().get(targetId);
+    target.myMethod();
+    cmdEvtSupport.fireCommandEvent(new CommandEvent(this, CommandResult.SUCCESSFUL));
+  }
+  
+  public void cancelCommand() {
+    cmdEvtSupport.fireCommandEvent(new CommandEvent(this, CommandResult.CANCELLED));
+  }
+
+  public void addCommandListener(CommandListener listener) {
+    cmdEvtSupport.addListener(listener);
+  }
+
+  public void addCommandListener(CommandListener listener, CommandResult... results) {
+    cmdEvtSupport.addListener(listener, results);
+  }
+
+}
++--------------------------------------------------------------------------+ 
+ 
+ Normally you won't need to directly implement the Command interface. You can instead
+ extend the AbstractCommand class and save some boilerplate code.   
+
+** Using AbstractCommand
+
+ The AbstractCommand class is a base implementation of the Command interface with some
+ other common facilities that typically needs to be used in a command.
+ 
+ Both the addCommandListener methods are implemented and the default implementation of
+ doCommand and cancelCommand fire a CommandEvent with appropriate result so, if you
+ override them you simply need to call super.doCommand or super.cancelCommand() at the
+ end of the method to fire the correct method to your command listeners.
+ 
+ Using AbstractCommand the example of the previous paragraph become:
+ 
++-------------------------------------------------------------------------+
+public class MyMethodCommand extends AbstractCommand {
+  private Long targetId;
+  
+  public void setTargetId(Long id) {
+    this.targetId = id;
+  }
+  
+  public Long getTargetId() {
+    return targetId;
+  }
+  
+  public void doCommand() {
+    MyEntity target = MyEntity.repository().get(targetId);
+    target.myMethod();
+    super.doCommand();
+  }
+
+}
++-------------------------------------------------------------------------+
+ 
+ Suppose that the method to be called takes a String parameter. We can add a String property to
+ our command to support it:
+
++-------------------------------------------------------------------------+
+public class MyMethodCommand extends AbstractCommand {
+  private Long targetId;
+  private String param;
+  
+  public void setTargetId(Long id) {
+    this.targetId = id;
+  }
+  
+  public Long getTargetId() {
+    return targetId;
+  }
+  
+  public void setParam(String param) {
+    this.param = param;
+  }
+  
+  public String getParam() {
+    return param;
+  }
+  
+  public void doCommand() {
+    MyEntity target = MyEntity.repository().get(targetId);
+    target.myMethod(param);
+    super.doCommand();
+  }
+
+}
++-------------------------------------------------------------------------+
+ 
+ If your client need to bind to this property the AbstractCommand class already implements the
+ PropertyChangeEmitter interface for you and has a protected firePropertyChange() method so you
+ only need to change your setParam method in this way:
+ 
++-------------------------------------------------------------------------+
+  public void setParam(String param) {
+    String old = getParam();
+    this.param = param;
+    firePropertyChange("param", old, param);
+  }
++-------------------------------------------------------------------------+
+ 
+ AbstractCommand implements the ValuesLister interface too. This means that you can retrieve the possible
+ values that are admitted for a property using the getPropertyValues() method. For example:
+ 
++-------------------------------------------------------------------------+
+	Command cmd = new MyMethodCommand();
+	Collection<?> possibleValues = cmd.getPropertyValues("param");
++-------------------------------------------------------------------------+ 
+ 
+ The algorithm used to retrieve the list of values is the following:
+ 
+ * If the command implements a method whose name is the same as the property getter but ends in "Values"
+   (i.e. getParamValues()) this method is called. The method must return a Collection of elements of
+   the same type of the property
+   
+ * If the property type is an enum, the values() method of the enum is used to retrieve the possible values
+ 
+ * If the property type implements the Entity interface the entity repository list() method is used to
+   retrieve the possible values
+   
+ * If nothing of the above matches, an empty list is returned
+
+** Properties writability and availability
+ 
+ Normally a property writability is controlled by the existence of its setter method. But we can do more.
+ There are cases where we need to dynamically control the writability of a property. In this cases we can
+ develop a isPropertyNameWritable() method (where PropertyName must be substituted with the name of the 
+ property) that returns a boolean. If this method returns true the property is writable, otherwise the
+ property is not writable.
+ 
+ We can check the writability of a property using PropertyWritabilityRetrieverImpl. Construct an instance
+ of this class passing the command to the constructor and then use the isPropertyWritable() method.
+ For example, a GUI could check if a property is writable to render the corresponding field as read-only.
+ 
+ Let's try it in a little example. Suppose you have a TakeOrderCommand command class and the user is
+ not supposed to change the quantity that can be ordered on the first day of month because in that
+ period you know you have stock shortage. You can do the following:
+ 
++-------------------------------------------------------------------------------+
+public class TakeOrderCommand {
+    ..........
+    
+    public void setQuantity(int qty) {
+        .......
+    }
+    
+    public boolean isQuantityWritable() {
+        return Calendar.getInstance().get(Calendar.DAY_OF_MONTH) != 1;
+    }
+    
+    ..........
+}
++-------------------------------------------------------------------------------+  
+ 
+ and then, to check writability:
+ 
++-------------------------------------------------------------------------------+
+  PropertyWritabilityRetriever wr = new PropertyWritabilityRetrieverImpl();
+  boolean result = wr.isPropertyWritable("quantity");
++-------------------------------------------------------------------------------+
+ 
+ In a similar way you can control the property availability, i.e. if the property makes sense in the
+ actual context of the command. For example, imagine to develop a command that prints a report. The
+ "duplex" property is available only if a printer is selected that can print on both faces of a sheet.
+ A GUI could check properties availability to render the corresponding field as visible or not.
+ 
+ To control property availability you can develop the corresponding isPropertyNameAvailable() method,
+ and to check it we can use the isPropertyAvailable() method of PropertyAvailabilityRetrieverImpl.
+
+* Editors
+
+ Domain objects maintain business state and have methods to modify this state. Frequently this state
+ can be modified directly without the need of a sophisticated method. Imagine, for example, the "description"
+ property of an Entity or a simple association between two entities.
+ 
+ Depending on your application needs there should be cases where you need to edit this state in a lot of ways.
+ And these ways only slightly depend by the domain object itself.
+ 
+ For example a user can be able to associate an entity with only a subset of another entity or he could want his
+ preferred way to chose among all the associable entities.
+ 
+ An Editor let you decouple an object from the way it can be modified.
+
+** Bean editors
+
+ The simplest editor is the bean editor: an editor that let you edit the properties of a bean.
+ 
+ There is an interface called BeanEditor for this but it has only methods for setting and retrieving the bean
+ that is being edited.
+ 
+ More interesting is the AbstractBeanEditor class that implements BeanEditor adding validation and property
+ change support. When the editing bean is set:
+ 
+ * the editor set a listener on the editing bean so each time a property change event is fired on the editing 
+   bean, the editor will fire a similar event
+
+ * the editor will become a Validator for the editing bean. When a call to a validating method is performed 
+   the editing bean itself will be validated
+
+ Typically you will extend AbstractBeanEditor to create your custom editors.
+ 
+ If you only need an out-of-the-box implementation for an editor that is able to edit all the properties of
+ an object you can use BeanEditorImpl.
+ 
+ BeanEditorImpl is an implementation of the 
+ {{{http://commons.apache.org/beanutils/apidocs/org/apache/commons/beanutils/package-summary.html#dynamic}DynaBean}} 
+ specification (from the Apache Commons BeanUtils project) that replicates all the properties of the bean
+ adding:
+ 
+ * Property change support
+ 
+ * Validation
+     
+
+** List editors
+
+ Editing a list of objects is a common task. An object that implements the ListEditor interface is able
+ to perform such a task.
+ 
+ This interface has methods:
+ 
+ * that retrieves an editor for a specified object in the list
+ 
+ * that adds a new object to the list and returns the corresponding editor
+ 
+ * that removes an object from list
+ 
+ The default implementation of ListEditor is the class ListEditorImpl.
+ 
+ Suppose you have a list of objects of class person. You can create an editor for this list with:
+ 
++----------------------------------------------+
+List<Person> persons = .....
+ListEditor<Person> listEditor = new ListEditorImpl<Person>(persons, Person.class);
++----------------------------------------------+
+
+ Now that you have the list editor you can retrieve an editor for the first element of the list:
+
++----------------------------------------------+
+BeanEditor<Person> personEditor = listEditor.getElementEditor(0);
++----------------------------------------------+
+ 
+ This editor will be an instance of BeanEditorImpl that wraps the underlying list element. In a 
+ subsequent section we will see how to customize this behavior to obtain an editor that is not an
+ instance of BeanEditorImpl but of you custom editor class.
+ 
+ To add an element to the list you can do:
+ 
++----------------------------------------------+
+listEditor.addRow();
++----------------------------------------------+
+ 
+ The new object will be created by calling its no-argument constructor and it will be added at the end 
+ of the list. Once the object has been created you can obtain its editor as before.
+ 
+ Like a ListBrowser a ListEditor implements the Selector interface so it has the concept of selecting
+ an object:
+ 
++----------------------------------------------+
+listEditor.select(2);
++----------------------------------------------+
+ 
+ You can remove the currently selected object from the list:
+ 
++----------------------------------------------+
+listEditor.deleteRow();
++----------------------------------------------+ 
+ 
+ The list that is beeing edited can be directly accessed using the "editingList" property.
+ 
++----------------------------------------------+
+listEditor.getEditingList();
+listEditor.setEditingList(newList);
++----------------------------------------------+
+ 
+ but modifying this list adding or removing objects is discouraged as it can be dangerous for
+ the correct behavior of the list editor.
+ 
+ This property is a bound property: every time the list is modified calling the addRow() or the deleteRow()
+ methods of the editor a PropertyChangeEvent is sent to all the listeners registered using the
+ addPropertyChangeListener() method.
+ 
+*** Customizing the access to the list
+
+ There are various points of the list editor that you can customize:
+ 
+ * How new objects are created
+ 
+ * How editors for the objects are created
+ 
+ * How elements are retrieved from the list
+ 
+ * How new elements are added to the list
+ 
+ * How elements are removed from the list
+ 
+ * Which elements can be removed from the list
+ 
+ All this can be achieved with a custom EditingListManager.
+ 
+ ListEditorImpl, by default, uses an instance of DefaultEditingListManager but you can create your own
+ implementation of the EditingListManager interface or, better, your own subclass of AbstractEditingListManager.
+ 
+ Suppose, for example, you have an Invoice class similar to:
+ 
++--------------------------------------------+
+public class Invoice {
+    
+    .........
+    
+    public List<InvoiceRow> getRows() {
+        return rows;
+    }
+    
+    public void addRow(InvoiceRow newRow) {
+        rows.add(newRow);
+        firePropertyChange("total");
+    }
+    
+    public void deleteRow(int rowIndex) {
+        rows.remove(rowIndex);
+    }
+    
+    public Money getTotal() {
+        return calculateTheInvoiceTotalInSomeWay();
+    }
+    
+    .........
+    
+}
++--------------------------------------------+  
+
+ It is important that you add and remove rows using the addRow() and deleteRow() methods of the invoice
+ class, otherwise listeners of the "total" property will not be notified.
+ 
+ But the DefaultEditingListManager directly modifies the collection. It doesn't knows about the addRow()
+ and the deleteRow() methods.
+ 
+ To solve the problem you can develop a subclass of AbstractEditingListManager:
+ 
++--------------------------------------------+
+public class InvoiceRowsEditingListManager extends AbstractEditingListManager<InvoiceRow> {
+    private Invoice invoice;
+
+    public InvoiceRowsEditingListManager(Invoice invoice) {
+        setEditingList(invoice.getRows());
+        this.invoice = invoice;
+    }
+
+    public BeanEditor<T> createElementEditor(T curr) {
+        return new BeanEditorImpl<T>(curr);
+    }
+
+    public BeanEditor<T> addRow(Object... param) {
+        InvoiceRow newElement = new InvoiceRow();
+        invoice.addRow(newElement);
+        return createElementEditor(newElement);
+    }
+
+    public InvoiceRow deleteRow(int idx) {
+	    InvoiceRow toBeDeleted = getEditingList().get(idx);
+		invoice.deleteRow(idx);
+		return toBeDeleted;
+    }
+
+    public boolean canDeleteRow(int idx) {
+        return idx >= 0 && idx < getEditingList().size();
+    }	
+}
++--------------------------------------------+
+
+ The structure of the class is rather simple.
+ 
+ The addRow() method creates a new instance of InvoiceRow and calls the addRow() method of the invoice,
+ then uses the createElementEditor() method to create an editor for this new object.
+ If you want you can further customize the createElementEditor() method so to use your own instance
+ of the bean editor.
+ 
+ The deleteRow() method calls the deleteRow() method of the invoice and returns the deleted object.
+ 
+ The canDeleteRow() method is used to check if an object can be removed from the collection. In this
+ case we are only checking that the provided index is valid for the collection.
+ 
+ We can use this class in the following way:
+ 
++--------------------------------------------+
+Invoice invoice = new Invoice();
+EditingListManager<Invoice> listManager = new InvoiceRowsEditingListManager(invoice);
+ListEditor<InvoiceRow> listEditor = new ListEditorImpl(listManager);
++--------------------------------------------+
+
+*** Editing and indexed property
+
+ The example given above is quite common and can be generalized if you use a certain pattern for the
+ methods.
+ 
+ You need in your bean:
+ 
+ * a method getPropertyName(int index) that return an element of the list
+ 
+ * a method addPropertyName(PropertyClass toBeAdded) that add a new element to the list
+ 
+ * a method removePropertyName(PropertyClass toBeRemoved) that delete an element from the list
+ 
+ If you followed these rules you can use the IndexedPropertyEditingListManager:
+ 
++----------------------------------------------+
+EditingListManager<InvoiceRow> mgr = new IndexedPropertyEditingListManager(invoice, "row");
++----------------------------------------------+
+
+ Out of the box this class will use a standard BeanEditorImpl as the editor for every single row.
+ If you need to create your own editor you can subclass it and redefine the createElementEditor()
+ method.
+
+*** NullListEditor
+
+ For testing purpose you can decide to use the NullListEditor implementation of the
+ ListEditor interface.
+ 
+ This class getEditingList() method always returns an empty list while the getElementEditor(),
+ consistently, always returns null.
+ 
+ If you try to use the addRow() and deleteRow() methods an UnsupportOperationException
+ will be raised.
+
+** Tree editors
+
+* Composing services
+
+ Services can be composed in a hierarchical way so, for example, a command can use a 
+ browser or an editor to obtain the entities and value objects it need.
+ 
+ An example can explain this concept well.
+ 
+ Suppose you are developing an online book shop and you need a OrderBookCommand.
+ 
+ This command needs two entities: the book to order and the customer that wants the book.
+ 
+ The book needs to be selected from a list so we'll use a Selector<Book> service, the
+ customer will be entered every time so we'll use a BeanEditor<Person>. In a real application
+ returning customers don't need to be entered from scratch every time but we'll ignore
+ this to simplify our example.
+ 
+ Our command will be something like:
+ 
++---------------------------------------------+
+public class OrderBookCommand extends AbstractCommand {
+    private Selector<Book> bookSelector;
+    private BeanEditor<Person> personEditor;
+    
+    public Selector<Book> getBookSelector() {
+        return bookSelector;
+    }
+    
+    public void setBookSelector(Selector<Book> bookSelector) {
+        this.bookSelector = bookSelector;
+    }
+    
+    public BeanEditor<Person> getPersonEditor() {
+        return personEditor;
+    }
+    
+    public void setPersonEditor(BeanEditor<Person> personEditor) {
+        this.personEditor = personEditor;
+    }
+    
+    public void doCommand() {
+        Book toBeOrdered = getBookSelector().getSelectedObject();
+        Person customer = personEditor.getEditingObject();
+        doWateverYouNeedToOrderTheBook(toBeOrdered, customer);
+    }
+}
++---------------------------------------------+
+
+ Now you can use dependency injection to provide the command with the services it needs.
+ You can inject mock services while testing or real services while running your real
+ application:
+ 
++---------------------------------------------+
+OrderBookCommand cmd = new OrderBookCommand();
+ListEditor<Book> bookSelector = new ListEditorImpl<Book>();
+bookSelector.setSpecification(new BookSpecification());
+cmd.setBookSelector(bookSelector);
+BeanEditor<Person> personEditor = new BeanEditorImpl<Person>();
+cmd.setPersonEditor(personEditor);
++---------------------------------------------+
+
+** MultipleCommand
+
+* Sessions
+
+* Contexts

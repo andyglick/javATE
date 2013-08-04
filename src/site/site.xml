@@ -1,0 +1,119 @@
+<project name="JavATE">
+
+  <bannerLeft>
+    <name>JavATE</name>
+    <src>images/javate-logo.png</src>
+    <href>http://www.javate.amattioli.it</href>
+  </bannerLeft>
+  
+  <bannerRight>
+  	<name>Sourceforge.net Logo</name>
+    <src>http://sflogo.sourceforge.net/sflogo.php?group_id=239418&amp;type=5</src>
+    <href>http://sourceforge.net</href>
+    <!-- 
+    <name>Nominate JavATE</name>
+    <src>http://sourceforge.net/images/cca/cca_nominate.png</src>
+    <href>http://sourceforge.net/community/cca09/nominate?project_name=javate&amp;project_url=http://javate.sourceforge.net/</href>
+     -->
+    <!-- 
+    <name>Codemotion</name>
+    <src>http://www.codemotion.it/sites/codemotion.it/files/image/codemotion_468_60.gif</src>
+    <href>http://www.codemotion.it/</href>
+     -->
+  </bannerRight>
+  
+  <head>
+	<meta name="keywords" content="java javate ddd domain driven design framework zk zkoss hibernate spring pattern repository specification"/>
+	
+	<!-- Google Analytics start -->
+	<script type="text/javascript">
+
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-15185349-1']);
+	  _gaq.push(['_trackPageview']);
+	
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+	
+	</script>
+	<!-- Google Analytics end -->
+  </head>
+  
+  <body>
+  	
+  	<menu name="Overview">
+  		<item name="Description" href="description.html"/>
+  		<item name="Examples">
+  			<item name="Basic" href="basicExample.html"/>
+  			<item name="Advanced" href="advancedExample.html"/>
+  			<item name="WorkstATE" href="workstateExample.html"/>
+  		</item>
+  		<item name="Articles">
+  			<item name="Custom Repositories" href="articles/repositories.html"/>
+  			<item name="JavATE and MongoDB" href="articles/mongodb.html"/>
+  			<item name="New Features in 0.5" href="newFeatures/newFeatures-0_5.html"/>
+  			<item name="New Features in 0.6" href="newFeatures/newFeatures-0_6.html"/>
+  			<item name="New Features in 0.7" href="newFeatures/newFeatures-0_7.html"/>
+  			<item name="New Features in 0.8" href="newFeatures/newFeatures-0_8.html"/>
+  		</item>
+  		<item name="News" href="http://sourceforge.net/news/?group_id=239418"/>
+  		<item name="Change-log" href="changelog.html"/>
+  		<item name="Forums" href="http://sourceforge.net/forum/?group_id=239418"/>
+  		<item name="License" href="license.html"/>
+  	</menu>
+  	
+  	<menu name="Download">
+  		<item name="Download on Sourceforge" href="https://sourceforge.net/projects/javate/files/"/>
+  	</menu>
+
+	<menu ref="modules"/>
+  	<!--
+  	<menu name="Sub Projects">
+  		<item name="Common">
+  			<item name="Overview" href="../common/index.html"/>
+  		</item>
+  		<item name="DominATE" href="../dominate/index.html">
+  			<item name="Overview" href="../dominate/index.html"/>
+  			<item name="User Guide" href="../dominate/description.html"/>
+  			<item name="Javadoc" href="../dominate/apidocs/index.html"/>
+  		</item>
+  		<item name="ApplicATE" href="../applicate/index.html">
+  			<item name="Overview" href="../applicate/index.html"/>
+  			<item name="User Guide" href="../applicate/description.html"/>
+  			<item name="Javadoc" href="../applicate/apidocs/index.html"/>
+  		</item>
+  		<item name="EncapsulATE" href="../encapsulate/index.html">
+  			<item name="Overview" href="../encapsulate/index.html"/>
+  			<item name="Javadoc" href="../encapsulate/apidocs/index.html"/>
+  		</item>
+  		<item name="AuthorizATE" href="../authorizate/index.html">
+  			<item name="Overview" href="../authorizate/index.html"/>
+  			<item name="Javadoc" href="../authorizate/apidocs/index.html"/>
+  		</item>
+  		<item name="GuidATE" href="../guidate/index.html">
+  			<item name="Overview" href="../guidate/index.html"/>
+  			<item name="User Guide" href="../guidate/description.html"/>
+  			<item name="Javadoc" href="../guidate/apidocs/index.html"/>
+  		</item>
+  		<item name="WorkstATE" href="../workstate/index.html">
+  			<item name="Overview" href="../workstate/index.html"/>
+  			<item name="Javadoc" href="../workstate/apidocs/index.html"/>
+  		</item>
+  	</menu>
+  	-->
+    <!-- <menu ref="reports"/> -->
+  </body>
+  
+  <poweredBy>
+    <logo name="Maven" href="http://maven.apache.org/"
+          img="http://maven.apache.org/images/logos/maven-feather.png"/>
+    
+    <logo name="Sourceforge.net Logo" href="http://sourceforge.net"
+          img="http://sflogo.sourceforge.net/sflogo.php?group_id=239418&amp;type=1"/>
+  </poweredBy>
+  
+  
+</project>

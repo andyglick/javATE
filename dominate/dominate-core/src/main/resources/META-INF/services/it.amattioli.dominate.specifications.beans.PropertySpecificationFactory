@@ -1,0 +1,4 @@
+it.amattioli.dominate.specifications.beans.EntityPropertySpecificationFactory
+it.amattioli.dominate.specifications.beans.EnumPropertySpecificationFactory
+it.amattioli.dominate.specifications.beans.ObjectPropertySpecificationFactory
+it.amattioli.dominate.specifications.beans.StringPropertySpecificationFactory

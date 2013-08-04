@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+
+  <properties>
+    <title>About JavATE ApplicATE</title>
+  </properties>
+  
+  <body>
+
+    <section name="About JavATE ApplicATE">
+      
+      	<p>
+      	When you have an object model, it is time to build at least an application with it. 
+      	ApplicATE helps you writing application services.
+  		</p>
+  
+  		<p>
+  		The idea on which ApplicATE is build is that most part of applications way of 
+  		interacting is:
+  		</p>
+  		
+  		<ol>
+    		<li> you browse between a network of objects</li>
+  
+    		<li> once you have reached the object you are interested in you send commands to it</li>
+  		</ol>
+  		
+		<p>
+  		So Applicate has two kinds of services:
+  		</p>
+  		
+  		<ul>
+    		<li>Browsers</li>
+  
+    		<li>Commands</li>  
+		</ul>
+		
+		<p>
+  		The most common way to browse objects is using a list. So ApplicATE has 
+  		interfaces and implementations for browsers that maintains a list of objects and 
+  		enables you to filter, sort and select them. These objects usually come from a 
+  		repository defined in your object model. If you used the Dominate Repository
+  		interface you don't mind where your objects are persisted. They can be in a 
+  		relational database, in a LDAP directory or a JCR content repository, you can 
+  		browse them all in the same way.
+  		</p>
+  		
+  		<p>
+  		Commands, instead, are objects that encapsulate the execution of an operation. 
+  		If your application users (human or computers) have to execute an operation you 
+  		can implement a command with an attribute for each parameter the operation needs. 
+  		Then using the doCommand() method you can trigger the operation execution.
+  		Using commands you have a lot of advantages. For example you can create composite 
+  		commands at runtime, transform a command in a transaction using a decorator or 
+  		collect the list of the commands the user executed to implement an undo list.
+  		</p>
+  		
+  		<p>
+  		Read the <a href="description.html">ApplicATE User Guide</a>
+  		</p>
+
+    </section>
+
+  </body>
+
+</document>

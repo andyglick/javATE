@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="simpleService" class="it.amattioli.springate.SimpleService"/>
+	
+	<bean id="threadLocalSimpleService" parent="threadLocalContext">
+		<constructor-arg ref="simpleService"/>
+	</bean>
+	
+	<bean id="longRunningSimpleService" parent="longRunningContext">
+		<constructor-arg ref="simpleService"/>
+	</bean>
+	
+	<bean id="simpleCommand" class="it.amattioli.springate.SimpleCommand"/>
+	
+	<bean id="transactionalSimpleCommand" parent="transactionalContext">
+		<constructor-arg ref="simpleCommand"/>
+	</bean>
+	
+	<bean id="fakeEntityRepository" parent="repository">
+		<constructor-arg value="it.amattioli.springate.FakeEntity"/>
+	</bean>
+	
+	<bean id="listBrowser" class="it.amattioli.applicate.browsing.ListBrowserImpl">
+		<constructor-arg ref="fakeEntityRepository"/>
+	</bean>
+
+</beans>

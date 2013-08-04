@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+
+  <properties>
+    <title>About JavATE DominATE</title>
+  </properties>
+
+  <body>
+
+    <section name="About JavATE DominATE">
+		
+        <p>
+        Dominate is the basement on which all other JavATE libraries are build. It contains 
+        interfaces for the basic patterns of domain driven design like "entity" and 
+        "repository". These interfaces gives you the possibility to access these objects 
+        in a standardized way allowing a lot of generalization and simplification.
+		</p>
+		
+		<p>
+  		Side by side with these interfaces there are implementations that speed up the 
+  		development of application using mainstream technologies like 
+  		<a href="http://www.hibernate.org">Hibernate</a>.
+  		</p>
+  		
+  		<p>
+  		Read the <a href="description.html">DominATE User Guide</a>
+  		</p>
+
+    </section>
+
+  </body>
+
+</document>
